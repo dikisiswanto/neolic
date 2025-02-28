@@ -41,17 +41,26 @@ export default function SalesTable() {
         <Input
           placeholder="Cari Nama Desa, Domain, atau Pelaksana"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
         />
         <Input
           type="date"
           value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
+          onChange={(e) => {
+            setStartDate(e.target.value);
+            setPage(1);
+          }}
         />
         <Input
           type="date"
           value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
+          onChange={(e) => {
+            setEndDate(e.target.value);
+            setPage(1);
+          }}
         />
       </div>
 
