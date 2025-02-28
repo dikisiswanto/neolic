@@ -26,7 +26,7 @@ export function App({ children }) {
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.3 }}
         >
-          <main className="max-w-7xl mx-auto px-3 lg:px-0">{children}</main>
+          <main className="container mx-auto px-3">{children}</main>
         </motion.div>
       </AnimatePresence>
     </>

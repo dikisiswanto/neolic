@@ -20,7 +20,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="bg-stone-900 text-white shadow-md border-b-2 border-stone-700 px-4 max-w-7xl mx-auto">
+    <header className="bg-stone-900 text-white shadow-md border-b-2 border-stone-700 px-4">
       <div className="container mx-auto flex items-center justify-between py-4 px-6">
         {/* Logo */}
         <h1 className="text-2xl font-bold tracking-widest uppercase">Neolic</h1>
