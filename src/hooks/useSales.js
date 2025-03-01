@@ -27,16 +27,26 @@ export function useSales({
           `/api/data/sales?page=${page}&pageSize=${pageSize}&sort=${sort}&order=${order}&search=${search}&startDate=${startDate}&endDate=${endDate}`
         );
         const json = await res.json();
-        if (!res.ok) throw new Error("Terjadi kesalahan: ", res.text);
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error(`Gagal mengambil data. Status: ${res.status}`);
+        }
+
+        if (json.data && json.data.length === 0) {
+          toast.info("Data tidak ditemukan.", {
+            duration: 5000,
+          });
+        }
+
         return json;
       } catch (error) {
         console.error(error);
-        toast(error.message);
+        toast.error(error.message);
         throw new Error(error);
       }
     },
     keepPreviousData: true, // Supaya pagination terasa cepat
     staleTime: 5000, // Cache data selama 5 detik sebelum refetch
-    onError: (error) => toast(error.message),
+    onError: (error) => toast.error(error.message),
   });
 }

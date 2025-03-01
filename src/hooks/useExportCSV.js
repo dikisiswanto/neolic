@@ -72,7 +72,7 @@ function useExportCSV() {
   const handleExportCSV = useCallback(
     (dataToExport) => {
       if (!dataToExport || dataToExport.length === 0) {
-        toast("Data tidak tersedia untuk diekspor.");
+        toast.info("Data tidak tersedia untuk diekspor.");
         return;
       }
 

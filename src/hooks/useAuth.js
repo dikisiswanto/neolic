@@ -21,7 +21,7 @@ export function useAuth() {
     setLoading(false);
 
     if (result?.error) {
-      toast(result.error);
+      toast.error(result.error);
     } else {
       router.push(callbackUrl);
     }

@@ -8,15 +8,19 @@ export function useStats() {
       try {
         const res = await fetch("/api/data/stats");
         const json = await res.json();
-        if (!res.ok) throw new Error("Terjadi kesalahan: ", res.text);
+
+        if (!res.ok) {
+          throw new Error(`Gagal mengambil data. Status: ${res.status}`);
+        }
+
         return json;
       } catch (error) {
         console.error(error.message);
-        toast(error.message);
+        toast.error(error.message);
         throw error;
       }
     },
     staleTime: 3600000, // 1 jam (1 hour = 60 * 60 * 1000 ms)
-    onError: (error) => toast(error.message),
+    onError: (error) => toast.error(error.message),
   });
 }

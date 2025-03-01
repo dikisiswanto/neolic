@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useSales } from "@/hooks/useSales";
+import { useState, useCallback } from "react";
 import { useDebounce } from "@/hooks/useDebounce";
 import {
   Table,
@@ -12,7 +11,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import { motion } from "framer-motion";
-import { Edit, Trash2, ArrowUp, ArrowDown, Download } from "lucide-react";
+import {
+  Edit,
+  Trash2,
+  ArrowUp,
+  ArrowDown,
+  CalendarIcon,
+  Download,
+  X,
+} from "lucide-react";
 import { Button } from "./ui/button";
 import {
   Select,
@@ -22,8 +29,17 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import useExportCSV from "@/hooks/useExportCSV";
+import { useSales } from "@/hooks/useSales";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
 
-export default function SalesTable() {
+export default function NewSalesTable() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState("");
@@ -48,14 +64,23 @@ export default function SalesTable() {
     order: debounceOrder,
   });
 
-  const pageSizeOptions = [10, 20, 25, 50, 100, 1000];
+  const pageSizeOptions = [10, 15, 20, 25, 50, 100, 500, 1000];
+  const { handleExportCSV } = useExportCSV();
 
   const changeSortOrder = (sortValue, orderValue) => {
     setSort(sortValue);
     setOrder(orderValue);
   };
 
-  const { handleExportCSV } = useExportCSV();
+  const resetStartDate = () => {
+    setStartDate("");
+    setPage(1);
+  };
+
+  const resetEndDate = () => {
+    setEndDate("");
+    setPage(1);
+  };
 
   return (
     <motion.div
@@ -66,30 +91,86 @@ export default function SalesTable() {
     >
       <div className="flex justify-between gap-2 mb-4">
         <Input
-          placeholder="Cari Nama Desa, Domain, atau Pelaksana"
+          placeholder="Cari Desa, Domain, atau Pelaksana"
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
             setPage(1);
           }}
         />
-        <Input
-          type="date"
-          value={startDate}
-          onChange={(e) => {
-            setStartDate(e.target.value);
-            setPage(1);
-          }}
-        />
-        <Input
-          type="date"
-          value={endDate}
-          onChange={(e) => {
-            setEndDate(e.target.value);
-            setPage(1);
-          }}
-        />
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={"outline"}
+              className={cn(
+                "w-full w-auto text-left font-normal",
+                !startDate && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {startDate ? (
+                format(startDate, "PPP", { locale: id })
+              ) : (
+                <span>Tanggal Mulai</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-2" align="start">
+            <Calendar
+              mode="single"
+              selected={startDate}
+              onSelect={(date) => {
+                setStartDate(date ? format(date, "yyyy-MM-dd") : undefined);
+                setPage(1);
+              }}
+              initialFocus
+              locale={id}
+            />
+          </PopoverContent>
+        </Popover>
+        {startDate && (
+          <Button variant={"outline"} size={"sm"} onClick={resetStartDate}>
+            <X className="h-4 w-4" />
+          </Button>
+        )}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={"outline"}
+              className={cn(
+                "w-full w-auto text-left font-normal",
+                !endDate && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {endDate ? (
+                format(endDate, "PPP", { locale: id })
+              ) : (
+                <span>Tanggal Berakhir</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-2" align="start">
+            <Calendar
+              mode="single"
+              selected={endDate}
+              onSelect={(date) => {
+                setEndDate(date ? format(date, "yyyy-MM-dd") : undefined);
+                setPage(1);
+              }}
+              initialFocus
+              locale={id}
+            />
+          </PopoverContent>
+        </Popover>
+        {endDate && (
+          <Button variant={"outline"} size={"sm"} onClick={resetEndDate}>
+            <X className="h-4 w-4" />
+          </Button>
+        )}
+
         <Select
+          className="w-auto"
           value={pageSize.toString()}
           onValueChange={(value) => setPageSize(parseInt(value, 10))}
         >
@@ -102,10 +183,7 @@ export default function SalesTable() {
             ))}
           </SelectContent>
         </Select>
-        <Button
-          className="hover:cursor-pointer"
-          onClick={() => handleExportCSV(data?.data)}
-        >
+        <Button onClick={() => handleExportCSV(data?.data)}>
           <Download /> Ekspor CSV
         </Button>
       </div>
@@ -115,15 +193,15 @@ export default function SalesTable() {
           <TableRow>
             <TableHead>No</TableHead>
             <TableHead className="w-auto">
-              Tgl Transaksi{" "}
+              Tgl Transaksi
               <ArrowUp
                 size={13}
                 className={cn(
-                  "hover:cursor-pointer inline-flex",
+                  "hover:cursor-pointer inline-flex ml-3",
                   sort === "purchased_at" && order === "asc" && "text-blue-500"
                 )}
                 onClick={() => changeSortOrder("purchased_at", "asc")}
-              />{" "}
+              />
               <ArrowDown
                 size={13}
                 className={cn(
@@ -134,15 +212,15 @@ export default function SalesTable() {
               />
             </TableHead>
             <TableHead>
-              Domain{" "}
+              Domain
               <ArrowUp
                 size={13}
                 className={cn(
-                  "hover:cursor-pointer inline-flex",
+                  "hover:cursor-pointer inline-flex ml-3",
                   sort === "domain_url" && order === "asc" && "text-blue-500"
                 )}
                 onClick={() => changeSortOrder("domain_url", "asc")}
-              />{" "}
+              />
               <ArrowDown
                 size={13}
                 className={cn(
@@ -171,7 +249,7 @@ export default function SalesTable() {
           ) : (
             data?.data?.map((sale, index) => (
               <TableRow key={sale.id}>
-                <TableCell>{(page - 1) * 10 + index + 1}</TableCell>
+                <TableCell>{(page - 1) * pageSize + index + 1}</TableCell>
                 <TableCell>
                   {new Date(sale.purchased_at).toLocaleDateString()}
                 </TableCell>
@@ -187,7 +265,7 @@ export default function SalesTable() {
                 <TableCell className="inline-flex gap-2">
                   <Button className="hover:cursor-pointer">
                     <Edit size={10} />
-                  </Button>{" "}
+                  </Button>
                   <Button
                     className="hover:cursor-pointer"
                     variant="destructive"
