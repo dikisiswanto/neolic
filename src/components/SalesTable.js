@@ -71,7 +71,7 @@ export default function NewSalesTable() {
     data: productsData,
     isLoading: isProductsLoading,
     error: productsError,
-  } = useProducts({ pageSize: 1000 });
+  } = useProducts({ pageSize: 10 });
 
   const pageSizeOptions = [10, 15, 20, 25, 50, 100, 500, 1000];
   const { handleExportCSV } = useExportCSV();
