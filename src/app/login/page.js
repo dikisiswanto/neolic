@@ -66,7 +66,7 @@ export default function LoginPage() {
           />
           <Button
             type="submit"
-            className="w-full"
+            className="w-full hover:cursor-pointer"
             disabled={loading}
             aria-live="polite"
           >

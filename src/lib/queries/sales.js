@@ -8,6 +8,7 @@ export async function getSales({
   search = "",
   startDate = null,
   endDate = null,
+  productId = null,
 }) {
   let query = supabase
     .from("purchases")
@@ -58,6 +59,10 @@ export async function getSales({
     query = query.gte("purchased_at", startDate);
   } else if (endDate) {
     query = query.lte("purchased_at", endDate);
+  }
+
+  if (productId) {
+    query = query.eq("product_id", productId);
   }
 
   const { data, error, count } = await query;

@@ -9,6 +9,7 @@ export function useSales({
   search = "",
   startDate = null,
   endDate = null,
+  productId = null,
 }) {
   return useQuery({
     queryKey: [
@@ -20,11 +21,12 @@ export function useSales({
       search,
       startDate,
       endDate,
+      productId,
     ],
     queryFn: async () => {
       try {
         const res = await fetch(
-          `/api/data/sales?page=${page}&pageSize=${pageSize}&sort=${sort}&order=${order}&search=${search}&startDate=${startDate}&endDate=${endDate}`
+          `/api/data/sales?page=${page}&pageSize=${pageSize}&sort=${sort}&order=${order}&search=${search}&startDate=${startDate}&endDate=${endDate}&productId=${productId}`
         );
         const json = await res.json();
         if (!res.ok) {

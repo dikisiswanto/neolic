@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
+import { useProducts } from "@/hooks/useProducts";
 
 export default function NewSalesTable() {
   const [page, setPage] = useState(1);
@@ -47,6 +48,7 @@ export default function NewSalesTable() {
   const [endDate, setEndDate] = useState("");
   const [sort, setSort] = useState("purchased_at");
   const [order, setOrder] = useState("desc");
+  const [productId, setProductId] = useState("");
 
   const debouncedSearch = useDebounce(search, 500);
   const debouncedStartDate = useDebounce(startDate, 500);
@@ -62,7 +64,14 @@ export default function NewSalesTable() {
     endDate: debouncedEndDate,
     sort: debounceSort,
     order: debounceOrder,
+    productId,
   });
+
+  const {
+    data: productsData,
+    isLoading: isProductsLoading,
+    error: productsError,
+  } = useProducts({ pageSize: 1000 });
 
   const pageSizeOptions = [10, 15, 20, 25, 50, 100, 500, 1000];
   const { handleExportCSV } = useExportCSV();
@@ -103,7 +112,7 @@ export default function NewSalesTable() {
             <Button
               variant={"outline"}
               className={cn(
-                "w-full w-auto text-left font-normal",
+                "w-full w-auto text-left font-normal hover:cursor-pointer",
                 !startDate && "text-muted-foreground"
               )}
             >
@@ -138,7 +147,7 @@ export default function NewSalesTable() {
             <Button
               variant={"outline"}
               className={cn(
-                "w-full w-auto text-left font-normal",
+                "w-full w-auto text-left font-normal hover:cursor-pointer",
                 !endDate && "text-muted-foreground"
               )}
             >
@@ -170,15 +179,53 @@ export default function NewSalesTable() {
         )}
 
         <Select
+          value={productId}
+          onValueChange={(value) => {
+            setProductId(value === "all" ? "" : value);
+            setPage(1);
+          }}
+        >
+          <SelectTrigger className="cursor-pointer">
+            {productId
+              ? productsData?.data?.find((product) => product.id === productId)
+                  ?.name || "Pilih Produk"
+              : "Semua Produk"}
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Semua Produk</SelectItem>
+            {isProductsLoading ? (
+              <SelectItem disabled value="loading">
+                Loading...
+              </SelectItem>
+            ) : productsError ? (
+              <SelectItem disabled value="error">
+                Error Memuat Produk
+              </SelectItem>
+            ) : (
+              productsData?.data?.map((product) => (
+                <SelectItem key={product.id} value={product.id}>
+                  {product.name}
+                </SelectItem>
+              ))
+            )}
+          </SelectContent>
+        </Select>
+
+        <Select
           className="w-auto"
           value={pageSize.toString()}
           onValueChange={(value) => setPageSize(parseInt(value, 10))}
         >
-          <SelectTrigger>Ukuran Halaman</SelectTrigger>
+          <SelectTrigger className="cursor-pointer">
+            {pageSize} per halaman
+          </SelectTrigger>
           <SelectContent>
-            {pageSizeOptions.map((pageSize) => (
-              <SelectItem key={pageSize} value={pageSize.toString()}>
-                {pageSize} per halaman
+            {pageSizeOptions.map((pageSizeOption) => (
+              <SelectItem
+                key={pageSizeOption}
+                value={pageSizeOption.toString()}
+              >
+                {pageSizeOption} per halaman
               </SelectItem>
             ))}
           </SelectContent>
