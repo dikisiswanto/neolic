@@ -48,12 +48,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-3">
+    <div className="flex min-h-screen items-center justify-center bg-gray-200 px-3">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-sm p-6 bg-foreground shadow-md rounded-lg"
+        className="w-full max-w-sm p-6 bg-white shadow-md rounded-lg"
       >
         <h1 className="text-2xl font-bold text-center mb-6">Login</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
