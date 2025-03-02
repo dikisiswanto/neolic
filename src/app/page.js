@@ -20,7 +20,7 @@ export default function Home() {
         </h1>
         <p className="text-gray-600 mt-2">Sistem Pencatatan Lisensi Tema</p>
         <Button
-          className="mt-5 px-6 py-2 cursor-pointer"
+          className="mt-5 px-6 py-2"
           onClick={() => router.push("/login")}
         >
           Masuk

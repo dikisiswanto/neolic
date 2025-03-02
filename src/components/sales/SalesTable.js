@@ -20,7 +20,7 @@ import {
   Download,
   X,
 } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import {
   Select,
   SelectContent,
@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import useExportCSV from "@/hooks/useExportCSV";
-import { useSales } from "@/hooks/useSales";
+import { useSales } from "@/hooks/sales/useSales";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -79,6 +79,7 @@ export default function NewSalesTable() {
   const changeSortOrder = (sortValue, orderValue) => {
     setSort(sortValue);
     setOrder(orderValue);
+    setPage(1);
   };
 
   const resetStartDate = () => {
@@ -92,13 +93,8 @@ export default function NewSalesTable() {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="p-4 bg-white rounded-lg"
-    >
-      <div className="flex justify-between gap-2 mb-4">
+    <section className="py-4 bg-white">
+      <div className="flex justify-between gap-2 mb-4 flex-col lg:flex-row">
         <Input
           placeholder="Cari Desa, Domain, atau Pelaksana"
           value={search}
@@ -107,76 +103,85 @@ export default function NewSalesTable() {
             setPage(1);
           }}
         />
-        <Popover>
-          <PopoverTrigger asChild>
+        <div className="flex gap-2 items-center justify-between max-w-full">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "w-full text-left font-normal",
+                  !startDate && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {startDate ? (
+                  format(startDate, "PPP", { locale: id })
+                ) : (
+                  <span>Tanggal Mulai</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-2" align="start">
+              <Calendar
+                mode="single"
+                selected={startDate}
+                onSelect={(date) => {
+                  setStartDate(date ? format(date, "yyyy-MM-dd") : undefined);
+                  setPage(1);
+                }}
+                initialFocus
+                locale={id}
+              />
+            </PopoverContent>
+          </Popover>
+          {startDate && (
             <Button
+              className="w-auto"
               variant={"outline"}
-              className={cn(
-                "w-full w-auto text-left font-normal hover:cursor-pointer",
-                !startDate && "text-muted-foreground"
-              )}
+              size={"sm"}
+              onClick={resetStartDate}
             >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {startDate ? (
-                format(startDate, "PPP", { locale: id })
-              ) : (
-                <span>Tanggal Mulai</span>
-              )}
+              <X className="h-4 w-4" />
             </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-2" align="start">
-            <Calendar
-              mode="single"
-              selected={startDate}
-              onSelect={(date) => {
-                setStartDate(date ? format(date, "yyyy-MM-dd") : undefined);
-                setPage(1);
-              }}
-              initialFocus
-              locale={id}
-            />
-          </PopoverContent>
-        </Popover>
-        {startDate && (
-          <Button variant={"outline"} size={"sm"} onClick={resetStartDate}>
-            <X className="h-4 w-4" />
-          </Button>
-        )}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant={"outline"}
-              className={cn(
-                "w-full w-auto text-left font-normal hover:cursor-pointer",
-                !endDate && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {endDate ? (
-                format(endDate, "PPP", { locale: id })
-              ) : (
-                <span>Tanggal Berakhir</span>
-              )}
+          )}
+        </div>
+        <div className="flex items-center justify-between max-w-full">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "text-left font-normal",
+                  !endDate && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {endDate ? (
+                  format(endDate, "PPP", { locale: id })
+                ) : (
+                  <span>Tanggal Berakhir</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-2" align="start">
+              <Calendar
+                mode="single"
+                selected={endDate}
+                onSelect={(date) => {
+                  setEndDate(date ? format(date, "yyyy-MM-dd") : undefined);
+                  setPage(1);
+                }}
+                initialFocus
+                locale={id}
+              />
+            </PopoverContent>
+          </Popover>
+          {endDate && (
+            <Button variant={"outline"} size={"sm"} onClick={resetEndDate}>
+              <X className="h-4 w-4" />
             </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-2" align="start">
-            <Calendar
-              mode="single"
-              selected={endDate}
-              onSelect={(date) => {
-                setEndDate(date ? format(date, "yyyy-MM-dd") : undefined);
-                setPage(1);
-              }}
-              initialFocus
-              locale={id}
-            />
-          </PopoverContent>
-        </Popover>
-        {endDate && (
-          <Button variant={"outline"} size={"sm"} onClick={resetEndDate}>
-            <X className="h-4 w-4" />
-          </Button>
-        )}
+          )}
+        </div>
 
         <Select
           value={productId}
@@ -214,10 +219,13 @@ export default function NewSalesTable() {
         <Select
           className="w-auto"
           value={pageSize.toString()}
-          onValueChange={(value) => setPageSize(parseInt(value, 10))}
+          onValueChange={(value) => {
+            setPageSize(parseInt(value, 10));
+            setPage(1);
+          }}
         >
           <SelectTrigger className="cursor-pointer">
-            {pageSize} per halaman
+            Tampilkan {pageSize} data per halaman
           </SelectTrigger>
           <SelectContent>
             {pageSizeOptions.map((pageSizeOption) => (
@@ -310,13 +318,10 @@ export default function NewSalesTable() {
                 <TableCell>{sale.product?.name}</TableCell>
                 <TableCell>{sale.buyer?.full_name}</TableCell>
                 <TableCell className="inline-flex gap-2">
-                  <Button className="hover:cursor-pointer">
+                  <Button>
                     <Edit size={10} />
                   </Button>
-                  <Button
-                    className="hover:cursor-pointer"
-                    variant="destructive"
-                  >
+                  <Button variant="destructive">
                     <Trash2 />
                   </Button>
                 </TableCell>
@@ -332,6 +337,6 @@ export default function NewSalesTable() {
         pageSize={data?.pageSize || 10}
         onChange={(newPage) => setPage(newPage)}
       />
-    </motion.div>
+    </section>
   );
 }

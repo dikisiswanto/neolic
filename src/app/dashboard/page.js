@@ -3,9 +3,7 @@
 import { useStats } from "@/hooks/useStats";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { Edit } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { App } from "../app";
 import { motion } from "framer-motion";
@@ -48,20 +46,6 @@ export default function DashboardPage() {
         >
           Dashboard
         </motion.h1>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Button
-            onClick={() => router.push("/sales")}
-            className="mb-4 flex items-center gap-2 transition-transform cursor-pointer"
-          >
-            <Edit size={16} />
-            Tambahkan Data Baru
-          </Button>
-        </motion.div>
 
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mt-3">
           {isLoading

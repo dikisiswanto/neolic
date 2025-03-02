@@ -20,8 +20,8 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="bg-stone-900 text-white shadow-md border-b-2 border-stone-700 px-4">
-      <div className="container mx-auto flex items-center justify-between py-4 px-6">
+    <header className="bg-stone-900 text-white shadow-md border-b-2 border-stone-700">
+      <div className="container mx-auto flex items-center justify-between py-4 px-4">
         {/* Logo */}
         <h1 className="text-2xl font-bold tracking-widest uppercase">Neolic</h1>
 
@@ -39,7 +39,7 @@ export default function Navbar() {
                   "text-base font-medium transition-colors px-4 py-2 rounded-lg",
                   pathname === item.path
                     ? "bg-stone-700 text-white"
-                    : "hover:bg-stone-700 hover:text-white hover:cursor-pointer"
+                    : "hover:bg-stone-700 hover:text-white"
                 )}
                 onClick={() => router.push(item.path)}
               >
@@ -53,7 +53,7 @@ export default function Navbar() {
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
           <Button
             variant="destructive"
-            className="hidden md:block rounded-lg cursor-pointer"
+            className="hidden md:block rounded-lg mr-0"
             onClick={() => router.push("/logout")}
           >
             Keluar
@@ -93,7 +93,7 @@ export default function Navbar() {
                   "text-base font-medium w-full text-left",
                   pathname === item.path
                     ? "bg-stone-700 text-white"
-                    : "hover:bg-stone-700 hover:text-white hover:cursor-pointer"
+                    : "hover:bg-stone-700 hover:text-white"
                 )}
                 onClick={() => {
                   router.push(item.path);
@@ -107,7 +107,7 @@ export default function Navbar() {
             {/* Logout Button (Mobile) */}
             <Button
               variant="destructive"
-              className="text-base w-full cursor-pointer"
+              className="text-base w-full"
               onClick={() => {
                 router.push("/logout");
                 setIsOpen(false);
