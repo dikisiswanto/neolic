@@ -37,3 +37,22 @@ export async function getProducts({
 
   return { data, count };
 }
+
+export async function getProductById(id) {
+  try {
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      console.error("Supabase error saat getProductById", error);
+      throw error;
+    }
+    return data;
+  } catch (error) {
+    console.error("Error in getProductById query:", error);
+    throw error;
+  }
+}

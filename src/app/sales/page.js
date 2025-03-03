@@ -2,7 +2,7 @@
 
 import { App } from "../app";
 import SalesTable from "@/components/sales/SalesTable";
-import AddSalesDialog from "@/components/sales/AddSalesDialog";
+import ManageSalesDialog from "@/components/sales/ManageSalesDialog";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,8 +11,48 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { useState, useCallback } from "react";
+import { Button } from "@/components/ui/button";
 
-export default function PurchasePage() {
+export default function SalesPage() {
+  const [isDialogOpenForAdd, setIsDialogOpenForAdd] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [initialSalesData, setInitialSalesData] = useState(null);
+  const [refreshSalesTable, setRefreshSalesTable] = useState(false);
+
+  const handleEditClick = useCallback((sale) => {
+    setInitialSalesData(sale);
+    setIsEditDialogOpen(true);
+  }, []);
+
+  const handleDialogClose = useCallback(() => {
+    setIsDialogOpenForAdd(false);
+    setIsEditDialogOpen(false);
+    setRefreshSalesTable((prev) => !prev);
+  }, []);
+
+  const handleDialogAddOpenChange = useCallback(
+    (newOpenState, submittedSalesData) => {
+      setIsDialogOpenForAdd(newOpenState);
+      if (!newOpenState && submittedSalesData) {
+        console.log("Data penjualan baru disubmit:", submittedSalesData);
+        setRefreshSalesTable((prev) => !prev);
+      }
+    },
+    []
+  );
+
+  const handleDialogEditOpenChange = useCallback(
+    (newOpenState, submittedSalesData) => {
+      setIsEditDialogOpen(newOpenState);
+      if (!newOpenState && submittedSalesData) {
+        console.log("Data penjualan diupdate:", submittedSalesData);
+        setRefreshSalesTable((prev) => !prev);
+      }
+    },
+    []
+  );
+
   return (
     <App>
       <div className="py-5">
@@ -27,10 +67,31 @@ export default function PurchasePage() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <h1 className="text-2xl font-bold">Data Penjualan</h1>
+        <h1 className="text-2xl font-bold mb-4">Data Penjualan</h1>
+        <Button onClick={() => setIsDialogOpenForAdd(true)}>
+          + Tambah Data Penjualan
+        </Button>
       </div>
-      <AddSalesDialog />
-      <SalesTable />
+
+      <ManageSalesDialog
+        open={isDialogOpenForAdd}
+        onOpenChange={handleDialogAddOpenChange}
+        mode="add"
+        onDialogClose={handleDialogClose}
+      />
+
+      <ManageSalesDialog
+        open={isEditDialogOpen}
+        onOpenChange={handleDialogEditOpenChange}
+        mode="edit"
+        initialSalesData={initialSalesData}
+        onDialogClose={handleDialogClose}
+      />
+
+      <SalesTable
+        onEditClick={handleEditClick}
+        refreshTrigger={refreshSalesTable}
+      />
     </App>
   );
 }

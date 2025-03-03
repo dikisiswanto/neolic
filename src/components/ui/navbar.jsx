@@ -50,7 +50,11 @@ export default function Navbar() {
         </nav>
 
         {/* Logout Button (Hidden on Small Screens) */}
-        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+        <motion.div
+          class="flex justify-end"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
           <Button
             variant="destructive"
             className="hidden md:block rounded-lg mr-0"

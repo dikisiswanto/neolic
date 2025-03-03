@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useDebounce } from "@/hooks/useDebounce";
 import {
   Table,
@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
-import { motion } from "framer-motion";
 import {
   Edit,
   Trash2,
@@ -38,9 +37,9 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import { useProducts } from "@/hooks/useProducts";
+import { useProducts } from "@/hooks/products/useProducts";
 
-export default function NewSalesTable() {
+export default function SalesTable({ onEditClick, refreshTrigger }) {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState("");
@@ -56,7 +55,7 @@ export default function NewSalesTable() {
   const debounceSort = useDebounce(sort, 500);
   const debounceOrder = useDebounce(order, 500);
 
-  const { data, isLoading } = useSales({
+  const { data, isLoading, error, refetch } = useSales({
     page,
     pageSize,
     search: debouncedSearch,
@@ -66,6 +65,10 @@ export default function NewSalesTable() {
     order: debounceOrder,
     productId,
   });
+
+  useEffect(() => {
+    refetch();
+  }, [refreshTrigger, refetch]);
 
   const {
     data: productsData,
@@ -103,13 +106,13 @@ export default function NewSalesTable() {
             setPage(1);
           }}
         />
-        <div className="flex gap-2 items-center justify-between max-w-full">
+        <div className="flex gap-2 items-center justify-between w-full">
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant={"outline"}
                 className={cn(
-                  "w-full text-left font-normal",
+                  "max-w-full flex-grow text-left font-normal",
                   !startDate && "text-muted-foreground"
                 )}
               >
@@ -136,7 +139,7 @@ export default function NewSalesTable() {
           </Popover>
           {startDate && (
             <Button
-              className="w-auto"
+              className="w-auto inline-block"
               variant={"outline"}
               size={"sm"}
               onClick={resetStartDate}
@@ -145,13 +148,13 @@ export default function NewSalesTable() {
             </Button>
           )}
         </div>
-        <div className="flex items-center justify-between max-w-full">
+        <div className="flex gap-2 items-center justify-between w-full">
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant={"outline"}
                 className={cn(
-                  "text-left font-normal",
+                  "max-w-full flex-grow text-left font-normal",
                   !endDate && "text-muted-foreground"
                 )}
               >
@@ -177,7 +180,12 @@ export default function NewSalesTable() {
             </PopoverContent>
           </Popover>
           {endDate && (
-            <Button variant={"outline"} size={"sm"} onClick={resetEndDate}>
+            <Button
+              className="w-auto inline-block"
+              variant={"outline"}
+              size={"sm"}
+              onClick={resetEndDate}
+            >
               <X className="h-4 w-4" />
             </Button>
           )}
@@ -318,7 +326,7 @@ export default function NewSalesTable() {
                 <TableCell>{sale.product?.name}</TableCell>
                 <TableCell>{sale.buyer?.full_name}</TableCell>
                 <TableCell className="inline-flex gap-2">
-                  <Button>
+                  <Button onClick={() => onEditClick(sale)}>
                     <Edit size={10} />
                   </Button>
                   <Button variant="destructive">

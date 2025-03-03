@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { LoaderCircle } from "lucide-react";
-import { useDebounce } from "@/hooks/useDebounce";
 import {
   Select,
   SelectTrigger,
@@ -25,7 +24,6 @@ import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -33,9 +31,6 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
-import { useVillages } from "@/hooks/useVillages";
-import { useProducts } from "@/hooks/useProducts";
-import { useBuyers } from "@/hooks/useBuyers";
 import {
   Popover,
   PopoverTrigger,
@@ -49,9 +44,8 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandSeparator,
-  CommandShortcut,
 } from "@/components/ui/command";
+import useManageSalesDialogLogic from "@/hooks/sales/useManageSalesDialogLogic";
 
 const MemoizedVillageCommandItem = memo(
   function VillageCommandItem({ village, onSelect }) {
@@ -89,82 +83,68 @@ const MemoizedBuyerCommandItem = memo(
   }
 );
 
-function AddSalesDialog() {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [transactionDate, setTransactionDate] = useState(new Date());
-  const [domainURL, setDomainURL] = useState("");
-  const [villageId, setVillageId] = useState("");
-
-  const [villageSearchTerm, setVillageSearchTerm] = useState("");
-  const villageSearchInputRef = useRef(null);
-  const debouncedVillageSearchTerm = useDebounce(villageSearchTerm, 300);
+function ManageSalesDialog({
+  open,
+  onOpenChange,
+  mode = "add",
+  initialSalesData,
+  onDialogClose,
+}) {
   const {
-    data: villagesQueryData,
-    isLoading: isVillagesLoading,
-    error: villagesError,
-  } = useVillages(
-    isDialogOpen
-      ? {
-          page: 1,
-          pageSize: 20,
-          search: debouncedVillageSearchTerm,
-        }
-      : { isFetch: false }
-  );
-  const villagesData = villagesQueryData?.data || [];
+    transactionDate,
+    setTransactionDate,
+    domainURL,
+    setDomainURL,
+    villageId,
+    setVillageId,
+    productId,
+    setProductId,
+    buyerId,
+    setBuyerId,
+    formErrors,
+    resetForm,
+    validateForm,
+    getSalesData,
+    initialVillageName,
+    initialBuyerName,
+    isInitialNamesLoading,
+    villageSearchTerm,
+    setVillageSearchTerm,
+    isVillageCommandDialogOpen,
+    setIsVillageCommandDialogOpen,
+    villagesData,
+    isVillagesLoading,
+    villagesError,
+    handleVillageSelect,
+    villageSearchInputRef,
+    buyerSearchTerm,
+    setBuyerSearchTerm,
+    isBuyerCommandDialogOpen,
+    setIsBuyerCommandDialogOpen,
+    buyersData,
+    isBuyersLoading,
+    buyersError,
+    handleBuyerSelect,
+    buyerSearchInputRef,
+    productsData,
+    isProductsLoading,
+    productsError,
+    handleSubmit,
+    handleDialogCloseButtonClick,
+    dialogTitle,
+    dialogDescription,
+    getVillageButtonLabel,
+    getBuyerButtonLabel,
+  } = useManageSalesDialogLogic({
+    open,
+    mode,
+    initialSalesData,
+    onOpenChange,
+    onDialogClose,
+  });
+
   const villageItemRefs = useRef([]);
-
-  const [productId, setProductId] = useState("");
-  const {
-    data: productsData,
-    isLoading: isProductsLoading,
-    error: productsError,
-  } = useProducts({});
-
-  const [buyerId, setBuyerId] = useState("");
-  const [buyerSearchTerm, setBuyerSearchTerm] = useState("");
-  const buyerSearchInputRef = useRef(null);
-  const debouncedBuyerSearchTerm = useDebounce(buyerSearchTerm, 300);
-  const {
-    data: buyersQueryData,
-    isLoading: isBuyersLoading,
-    error: buyersError,
-  } = useBuyers(
-    isDialogOpen
-      ? {
-          page: 1,
-          pageSize: 20,
-          search: debouncedBuyerSearchTerm,
-        }
-      : { isFetch: false }
-  );
-  const buyersData = buyersQueryData?.data || [];
   const buyerItemRefs = useRef([]);
-
-  const [formErrors, setFormErrors] = useState({});
-  const [isVillageCommandDialogOpen, setIsVillageCommandDialogOpen] =
-    useState(false);
-  const [isBuyerCommandDialogOpen, setIsBuyerCommandDialogOpen] =
-    useState(false);
-
-  const resetDialogState = useCallback(() => {
-    setTransactionDate(new Date());
-    setDomainURL("");
-    setVillageId("");
-    setProductId("");
-    setBuyerId("");
-    setVillageSearchTerm("");
-    setBuyerSearchTerm("");
-    setFormErrors({});
-    setIsVillageCommandDialogOpen(false);
-    setIsBuyerCommandDialogOpen(false);
-  }, []);
-
-  useEffect(() => {
-    if (!isDialogOpen) {
-      resetDialogState();
-    }
-  }, [isDialogOpen, resetDialogState]);
 
   useEffect(() => {
     if (villagesData && isVillageCommandDialogOpen) {
@@ -188,35 +168,14 @@ function AddSalesDialog() {
     }
   }, [buyersData, isBuyerCommandDialogOpen]);
 
-  const handleVillageSelect = useCallback(
-    (id) => {
-      setVillageId(id);
-      setIsVillageCommandDialogOpen(false);
-    },
-    [setVillageId]
-  );
-
-  const handleBuyerSelect = useCallback(
-    (id) => {
-      setBuyerId(id);
-      setIsBuyerCommandDialogOpen(false);
-    },
-    [setBuyerId]
-  );
-
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogTrigger asChild>
-        <Button>+ Tambah Data Penjualan</Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[550px]">
         <DialogHeader>
-          <DialogTitle>Tambah Data Penjualan Baru</DialogTitle>
-          <DialogDescription>
-            Isi formulir berikut untuk menambahkan data penjualan.
-          </DialogDescription>
+          <DialogTitle>{dialogTitle}</DialogTitle>
+          <DialogDescription>{dialogDescription}</DialogDescription>
         </DialogHeader>
-        <form className="grid gap-4 py-4">
+        <form className="grid gap-4 py-4" onSubmit={handleSubmit}>
           <div>
             <Label className="pb-1">Tanggal Transaksi</Label>
             <Popover>
@@ -239,7 +198,13 @@ function AddSalesDialog() {
                 />
               </PopoverContent>
             </Popover>
+            {formErrors.transactionDate && (
+              <p className="text-sm text-red-500 mt-1">
+                {formErrors.transactionDate}
+              </p>
+            )}
           </div>
+
           <div>
             <Label className="pb-1">Domain URL</Label>
             <Input
@@ -247,27 +212,25 @@ function AddSalesDialog() {
               value={domainURL}
               onChange={(e) => setDomainURL(e.target.value)}
             />
+            {formErrors.domainURL && (
+              <p className="text-sm text-red-500 mt-1">
+                {formErrors.domainURL}
+              </p>
+            )}
           </div>
 
           <div>
             <Label className="pb-1">Desa</Label>
             <Button
               variant="outline"
-              className="w-full overflow-hidden text-ellipsis whitespace-nowrap items-start"
+              className="w-full overflow-hidden text-ellipsis whitespace-nowrap flex-start"
               type="button"
-              disabled={isVillagesLoading || villagesError}
+              disabled={
+                isVillagesLoading || villagesError || isInitialNamesLoading
+              }
               onClick={() => setIsVillageCommandDialogOpen(true)}
             >
-              {!villageId
-                ? "Pilih Desa"
-                : villageId &&
-                    villagesData &&
-                    villagesData?.length &&
-                    !isVillagesLoading
-                  ? `${villagesData.find((v) => v.id === villageId)?.name}, Kec. ${villagesData.find((v) => v.id === villageId)?.district?.name}, ${villagesData.find((v) => v.id === villageId)?.district?.regency?.name}`
-                  : villagesError
-                    ? "Gagal memuat Desa"
-                    : "Pilih Desa"}
+              {getVillageButtonLabel()}
             </Button>
             <CommandDialog
               open={isVillageCommandDialogOpen}
@@ -296,8 +259,9 @@ function AddSalesDialog() {
                     <CommandGroup>
                       {villagesData?.map((village, index) => {
                         villageItemRefs.current[index] =
-                          villageItemRefs.current[index] || createRef();
+                          villageItemRefs.current[index] || createRef(); // Keep ref creation here
                         return (
+                          // Separate return statement
                           <MemoizedVillageCommandItem
                             key={village.id}
                             village={village}
@@ -313,6 +277,11 @@ function AddSalesDialog() {
             {villagesError && (
               <p className="text-sm text-red-500 mt-1">
                 {villagesError.message || "Gagal memuat desa."}
+              </p>
+            )}
+            {formErrors.villageId && (
+              <p className="text-sm text-red-500 mt-1">
+                {formErrors.villageId}
               </p>
             )}
           </div>
@@ -370,6 +339,11 @@ function AddSalesDialog() {
                 {productsError.message || "Gagal memuat produk."}
               </p>
             )}
+            {formErrors.productId && (
+              <p className="text-sm text-red-500 mt-1">
+                {formErrors.productId}
+              </p>
+            )}
           </div>
 
           <div>
@@ -378,19 +352,10 @@ function AddSalesDialog() {
               variant="outline"
               className="w-full overflow-hidden text-ellipsis whitespace-nowrap items-start"
               type="button"
-              disabled={isBuyersLoading || buyersError}
+              disabled={isBuyersLoading || buyersError || isInitialNamesLoading}
               onClick={() => setIsBuyerCommandDialogOpen(true)}
             >
-              {!buyerId
-                ? "Pilih Pembeli"
-                : buyerId &&
-                    buyersData &&
-                    buyersData?.length &&
-                    !isBuyersLoading
-                  ? `${buyersData.find((b) => b.id === buyerId)?.full_name}`
-                  : buyersError
-                    ? "Gagal memuat Pembeli"
-                    : "Pilih Pembeli"}
+              {getBuyerButtonLabel()}
             </Button>
             <CommandDialog
               open={isBuyerCommandDialogOpen}
@@ -438,13 +403,23 @@ function AddSalesDialog() {
                 {buyersError.message || "Gagal memuat pembeli."}
               </p>
             )}
+            {formErrors.buyerId && (
+              <p className="text-sm text-red-500 mt-1">{formErrors.buyerId}</p>
+            )}
           </div>
 
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="secondary">Batal</Button>
+              <Button
+                variant="secondary"
+                onClick={handleDialogCloseButtonClick}
+              >
+                Batal
+              </Button>
             </DialogClose>
-            <Button type="submit">Simpan</Button>
+            <Button type="submit" disabled={isInitialNamesLoading}>
+              Simpan
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -452,4 +427,4 @@ function AddSalesDialog() {
   );
 }
 
-export default AddSalesDialog;
+export default ManageSalesDialog;

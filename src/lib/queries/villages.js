@@ -31,3 +31,34 @@ export async function getVillages({ search = "", page = 1, pageSize = 10 }) {
 
   return { data, count };
 }
+
+export async function getVillageById(id) {
+  try {
+    const { data, error } = await supabase
+      .from("villages")
+      .select(
+        `
+        id,
+        name,
+        district:districts(
+          name,
+          regency:regencies(
+            name,
+            province:provinces(name)
+          )
+        )
+      `
+      )
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      console.error("Supabase error saat getVillageById", error);
+      throw error;
+    }
+    return data;
+  } catch (error) {
+    console.error("Error in getVillageById query:", error);
+    throw error;
+  }
+}

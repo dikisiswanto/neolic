@@ -22,3 +22,22 @@ export async function getBuyers({ search = "", page = 1, pageSize = 10 }) {
 
   return { data, count };
 }
+
+export async function getBuyerById(id) {
+  try {
+    const { data, error } = await supabase
+      .from("buyers")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      console.error("Supabase error saat getBuyerById", error);
+      throw error;
+    }
+    return data;
+  } catch (error) {
+    console.error("Error in getBuyerById query:", error);
+    throw error;
+  }
+}
