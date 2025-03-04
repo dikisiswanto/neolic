@@ -10,7 +10,7 @@ export function useStats() {
         const json = await res.json();
 
         if (!res.ok) {
-          throw new Error(`Gagal mengambil data. Status: ${res.status}`);
+          throw new Error(`Gagal memuat data statistik`);
         }
 
         return json;

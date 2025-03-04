@@ -16,11 +16,12 @@ export function useProducts({
         const res = await fetch(
           `/api/data/products?page=${page}&pageSize=${pageSize}&sort=${sort}&order=${order}&search=${search}`
         );
-        const json = await res.json();
+
         if (!res.ok) {
-          const errorText = await res.text();
-          throw new Error(`Gagal mengambil data produk. Status: ${res.status}`);
+          throw new Error(`Gagal memuat data produk.`);
         }
+
+        const json = await res.json();
 
         if (json.data && json.data.length === 0) {
           toast.info("Produk tidak ditemukan.", {

@@ -28,11 +28,12 @@ export function useSales({
         const res = await fetch(
           `/api/data/sales?page=${page}&pageSize=${pageSize}&sort=${sort}&order=${order}&search=${search}&startDate=${startDate}&endDate=${endDate}&productId=${productId}`
         );
-        const json = await res.json();
+
         if (!res.ok) {
-          const errorText = await res.text();
-          throw new Error(`Gagal mengambil data. Status: ${res.status}`);
+          throw new Error(`Gagal memuat data penjualan.`);
         }
+
+        const json = await res.json();
 
         if (json.data && json.data.length === 0) {
           toast.info("Data tidak ditemukan.", {

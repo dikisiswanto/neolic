@@ -3,14 +3,14 @@
 import { useStats } from "@/hooks/useStats";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { App } from "../app";
 import { motion } from "framer-motion";
+import { MonthlyBarChart } from "@/components/dashboard/MonthlyBarChart";
+import { SalesPerProvinceChart } from "@/components/dashboard/SalesPerProvinceChart";
 
 export default function DashboardPage() {
   const { data, isLoading } = useStats();
-  const router = useRouter();
 
   const stats = [
     {
@@ -37,7 +37,7 @@ export default function DashboardPage() {
 
   return (
     <App>
-      <div className="py-5">
+      <div className="py-5 space-y-4">
         <motion.h1
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -78,6 +78,28 @@ export default function DashboardPage() {
                   </Card>
                 </motion.div>
               ))}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {isLoading ? (
+            Array(2)
+              .fill(0)
+              .map((_, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                >
+                  <Skeleton className="h-96 w-full" />
+                </motion.div>
+              ))
+          ) : (
+            <>
+              <MonthlyBarChart data={data?.monthlySalesData || []} />
+              <SalesPerProvinceChart data={data?.salesPerProvinceData || []} />
+            </>
+          )}
         </div>
       </div>
     </App>

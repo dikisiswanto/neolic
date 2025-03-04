@@ -14,14 +14,12 @@ export function useBuyers({
         const res = await fetch(
           `/api/data/buyers?page=${page}&pageSize=${pageSize}&search=${search}`
         );
-        const json = await res.json();
 
         if (!res.ok) {
-          const errorText = await res.text();
-          throw new Error(
-            `Gagal mengambil data pembeli. Status: ${res.status}`
-          );
+          throw new Error(`Gagal memuat data pembeli.`);
         }
+
+        const json = await res.json();
 
         if (json.data && json.data.length === 0) {
           toast.info("Pembeli tidak ditemukan.", {

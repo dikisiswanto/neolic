@@ -51,7 +51,7 @@ export default function Navbar() {
 
         {/* Logout Button (Hidden on Small Screens) */}
         <motion.div
-          class="flex justify-end"
+          className="flex justify-end"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >

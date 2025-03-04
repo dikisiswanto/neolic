@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
-  memo,
-  createRef,
-} from "react";
+import { useState, useEffect, useRef, memo, createRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -95,18 +88,9 @@ function ManageSalesDialog({
     setTransactionDate,
     domainURL,
     setDomainURL,
-    villageId,
-    setVillageId,
     productId,
     setProductId,
-    buyerId,
-    setBuyerId,
     formErrors,
-    resetForm,
-    validateForm,
-    getSalesData,
-    initialVillageName,
-    initialBuyerName,
     isInitialNamesLoading,
     villageSearchTerm,
     setVillageSearchTerm,
@@ -135,6 +119,7 @@ function ManageSalesDialog({
     dialogDescription,
     getVillageButtonLabel,
     getBuyerButtonLabel,
+    isSubmitting,
   } = useManageSalesDialogLogic({
     open,
     mode,
@@ -155,7 +140,7 @@ function ManageSalesDialog({
         villageItemRefs.current[0].current?.focus();
       }
     }
-  }, [villagesData, isVillageCommandDialogOpen]);
+  }, [villagesData, isVillageCommandDialogOpen, villageSearchInputRef]);
 
   useEffect(() => {
     if (buyersData && isBuyerCommandDialogOpen) {
@@ -166,7 +151,7 @@ function ManageSalesDialog({
         buyerItemRefs.current[0].current?.focus();
       }
     }
-  }, [buyersData, isBuyerCommandDialogOpen]);
+  }, [buyersData, isBuyerCommandDialogOpen, buyerSearchInputRef]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -259,9 +244,8 @@ function ManageSalesDialog({
                     <CommandGroup>
                       {villagesData?.map((village, index) => {
                         villageItemRefs.current[index] =
-                          villageItemRefs.current[index] || createRef(); // Keep ref creation here
+                          villageItemRefs.current[index] || createRef();
                         return (
-                          // Separate return statement
                           <MemoizedVillageCommandItem
                             key={village.id}
                             village={village}
@@ -300,8 +284,8 @@ function ManageSalesDialog({
                   }
                 >
                   {productId
-                    ? productsData?.data?.find((p) => p.id == productId)
-                        ?.name || "Produk Dipilih"
+                    ? productsData?.find((p) => p.id == productId)?.name ||
+                      "Produk Dipilih"
                     : productsError
                       ? "Gagal memuat Produk"
                       : "Pilih Produk"}
@@ -317,8 +301,8 @@ function ManageSalesDialog({
                   <div className="p-2 text-center text-red-500">
                     Gagal memuat produk. Silakan coba lagi.
                   </div>
-                ) : productsData?.data?.length ? (
-                  productsData.data.map((product) => (
+                ) : productsData?.length ? (
+                  productsData.map((product) => (
                     <SelectItem
                       key={product.id}
                       value={product.id}
@@ -417,7 +401,10 @@ function ManageSalesDialog({
                 Batal
               </Button>
             </DialogClose>
-            <Button type="submit" disabled={isInitialNamesLoading}>
+            <Button
+              type="submit"
+              disabled={isInitialNamesLoading || isSubmitting}
+            >
               Simpan
             </Button>
           </DialogFooter>

@@ -39,4 +39,52 @@ const getDashboardData = async () => {
   return { currentMonthPurchase, totalPurchase, totalProducts, totalBuyers };
 };
 
-export { getDashboardData };
+export async function getMonthlySalesData() {
+  try {
+    const { data, error } = await supabase
+      .from("monthly_sales_stats_mv")
+      .select("sale_year, sale_month, sales_count");
+
+    if (error) {
+      console.error(
+        "Supabase error saat mengambil data dari materialized view monthly_sales_stats_mv",
+        error
+      );
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error(
+      "Terjadi kesalahan dalam fungsi getMonthlySalesData (direct MV query):",
+      error
+    );
+    throw error;
+  }
+}
+
+export async function getSalesPerProvinceData() {
+  try {
+    const { data, error } = await supabase
+      .from("sales_per_province_mv")
+      .select("province_name, sales_count");
+
+    if (error) {
+      console.error(
+        "Supabase error saat mengambil data penjualan per provinsi:",
+        error
+      );
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error(
+      "Terjadi kesalahan dalam fungsi getSalesPerProvinceData:",
+      error
+    );
+    throw error;
+  }
+}
+
+export { getDashboardData, getMonthlySalesData, getSalesPerProvinceData };

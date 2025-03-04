@@ -1,12 +1,12 @@
-// hooks/sales/useManageSalesDialogLogic.js
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useVillages } from "@/hooks/villages/useVillages";
 import { useBuyers } from "@/hooks/buyers/useBuyers";
 import { useProducts } from "@/hooks/products/useProducts";
 import useSalesDialogForm from "@/hooks/sales/useSalesDialogForm";
+import { useSalesDataMutation } from "@/hooks/sales/useSalesDataMutation";
 import { useInitialNames } from "@/hooks/sales/useInitialNames";
 import { LoaderCircle } from "lucide-react";
 
@@ -38,6 +38,8 @@ const useManageSalesDialogLogic = ({
   const { initialVillageName, initialBuyerName, isInitialNamesLoading } =
     useInitialNames(mode, initialSalesData);
 
+  const { mutateSalesData, isLoading: isSubmitting } = useSalesDataMutation();
+
   const [villageSearchTerm, setVillageSearchTerm] = useState("");
   const debouncedVillageSearchTerm = useDebounce(villageSearchTerm, 300);
   const [isVillageCommandDialogOpen, setIsVillageCommandDialogOpen] =
@@ -56,7 +58,9 @@ const useManageSalesDialogLogic = ({
         }
       : { isFetch: false }
   );
-  const villagesData = villagesQueryData?.data || [];
+  const villagesData = useMemo(() => {
+    return villagesQueryData?.data || [];
+  }, [villagesQueryData?.data]);
   const handleVillageSelect = useCallback(
     (id) => {
       setVillageId(id);
@@ -83,7 +87,9 @@ const useManageSalesDialogLogic = ({
         }
       : { isFetch: false }
   );
-  const buyersData = buyersQueryData?.data || [];
+  const buyersData = useMemo(() => {
+    return buyersQueryData?.data || [];
+  }, [buyersQueryData?.data]);
   const handleBuyerSelect = useCallback(
     (id) => {
       setBuyerId(id);
@@ -93,39 +99,71 @@ const useManageSalesDialogLogic = ({
   );
 
   const {
-    data: productsData,
+    data: productsQueryData,
     isLoading: isProductsLoading,
     error: productsError,
   } = useProducts({});
+  const productsData = useMemo(() => {
+    return productsQueryData?.data || [];
+  }, [productsQueryData?.data]);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleSubmit = useCallback(
+    async (event) => {
+      event.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
+      if (!validateForm()) {
+        return;
+      }
 
-    const salesData = getSalesData();
+      const salesData = getSalesData();
 
-    if (mode === "add") {
-      console.log("Menambahkan data penjualan:", salesData);
-    } else if (mode === "edit" && initialSalesData) {
-      console.log(
-        "Mengedit data penjualan:",
-        salesData,
-        "ID:",
-        initialSalesData.id
-      );
-    }
+      try {
+        let newSalesData;
+        if (mode === "add") {
+          newSalesData = await mutateSalesData({ mode: "add", salesData });
+          console.log("Sales data created successfully:", newSalesData);
+        } else if (mode === "edit" && initialSalesData) {
+          newSalesData = await mutateSalesData({
+            mode: "edit",
+            salesData,
+            id: initialSalesData.id,
+          });
+          console.log("Sales data updated successfully:", newSalesData);
+        }
 
-    onOpenChange(false, salesData);
-    onDialogClose();
-  };
+        onOpenChange(false, newSalesData);
+        onDialogClose();
+        resetForm();
+      } catch (error) {
+        console.error(`Error submitting sales data (${mode} mode):`, error);
+        if (typeof error === "object" && error !== null && error.errors) {
+          setFormErrors(error.errors);
+        } else {
+          setFormErrors((prevState) => ({
+            ...prevState,
+            submission: `Failed to ${mode === "edit" ? "update" : "create"} sales data.`,
+          }));
+        }
+      }
+    },
+    [
+      mode,
+      initialSalesData,
+      validateForm,
+      getSalesData,
+      mutateSalesData,
+      onOpenChange,
+      onDialogClose,
+      resetForm,
+      setFormErrors,
+    ]
+  );
 
-  const handleDialogCloseButtonClick = () => {
+  const handleDialogCloseButtonClick = useCallback(() => {
     onOpenChange(false);
     onDialogClose();
-  };
+    resetForm();
+  }, [onOpenChange, onDialogClose, resetForm]);
 
   useEffect(() => {
     if (mode === "edit" && initialSalesData) {
@@ -137,7 +175,104 @@ const useManageSalesDialogLogic = ({
     } else if (mode === "add" && open) {
       resetForm();
     }
-  }, [mode, initialSalesData, resetForm, open]);
+  }, [
+    mode,
+    initialSalesData,
+    resetForm,
+    open,
+    setBuyerId,
+    setDomainURL,
+    setProductId,
+    setTransactionDate,
+    setVillageId,
+  ]);
+
+  const getVillageButtonLabel = useCallback(() => {
+    if (mode === "edit") {
+      if (isInitialNamesLoading) {
+        return (
+          <>
+            <LoaderCircle className="h-4 w-4 animate-spin mr-2" />
+            Memuat Desa...
+          </>
+        );
+      }
+      if (
+        villageId &&
+        villagesData &&
+        villagesData?.length &&
+        !isVillagesLoading
+      ) {
+        const selectedVillage = villagesData.find((v) => v.id === villageId);
+        if (selectedVillage) {
+          return `${selectedVillage.name}, Kec. ${selectedVillage.district?.name}, ${selectedVillage.district?.regency?.name}`;
+        }
+      }
+      return initialVillageName ? `${initialVillageName}` : "Pilih Desa";
+    }
+    if (!villageId) {
+      return "Pilih Desa";
+    }
+    if (villagesData && villagesData?.length && !isVillagesLoading) {
+      const selectedVillage = villagesData.find((v) => v.id === villageId);
+      if (selectedVillage) {
+        return `${selectedVillage.name}, Kec. ${selectedVillage.district?.name}, ${selectedVillage.district?.regency?.name}`;
+      }
+    }
+    if (villagesError) {
+      return "Gagal memuat Desa";
+    }
+    return "Pilih Desa";
+  }, [
+    mode,
+    isInitialNamesLoading,
+    villageId,
+    villagesData,
+    isVillagesLoading,
+    villagesError,
+    initialVillageName,
+  ]);
+
+  const getBuyerButtonLabel = useCallback(() => {
+    if (mode === "edit") {
+      if (isInitialNamesLoading) {
+        return (
+          <>
+            <LoaderCircle className="h-4 w-4 animate-spin mr-2" />
+            Memuat Pembeli...
+          </>
+        );
+      }
+      if (buyerId && buyersData && buyersData?.length && !isBuyersLoading) {
+        const selectedBuyer = buyersData.find((b) => b.id === buyerId);
+        if (selectedBuyer) {
+          return `${selectedBuyer.full_name}`;
+        }
+      }
+      return initialBuyerName ? initialBuyerName : "Pilih Pembeli";
+    }
+    if (!buyerId) {
+      return "Pilih Pembeli";
+    }
+    if (buyersData && buyersData?.length && !isBuyersLoading) {
+      const selectedBuyer = buyersData.find((b) => b.id === buyerId);
+      if (selectedBuyer) {
+        return `${selectedBuyer.full_name}`;
+      }
+    }
+    if (buyersError) {
+      return "Gagal memuat Pembeli";
+    }
+    return "Pilih Pembeli";
+  }, [
+    mode,
+    isInitialNamesLoading,
+    buyerId,
+    buyersData,
+    isBuyersLoading,
+    buyersError,
+    initialBuyerName,
+  ]);
 
   return {
     transactionDate,
@@ -188,75 +323,9 @@ const useManageSalesDialogLogic = ({
         ? "Edit formulir berikut untuk memperbarui data penjualan."
         : "Isi formulir berikut untuk menambahkan data penjualan.",
     mode,
-    getVillageButtonLabel: () => {
-      if (mode === "edit") {
-        if (isInitialNamesLoading) {
-          return (
-            <>
-              <LoaderCircle className="h-4 w-4 animate-spin mr-2" />
-              Memuat Desa...
-            </>
-          );
-        }
-        if (
-          villageId &&
-          villagesData &&
-          villagesData?.length &&
-          !isVillagesLoading
-        ) {
-          const selectedVillage = villagesData.find((v) => v.id === villageId);
-          if (selectedVillage) {
-            return `${selectedVillage.name}, Kec. ${selectedVillage.district?.name}, ${selectedVillage.district?.regency?.name}`;
-          }
-        }
-        return initialVillageName ? `${initialVillageName}` : "Pilih Desa";
-      }
-      if (!villageId) {
-        return "Pilih Desa";
-      }
-      if (villagesData && villagesData?.length && !isVillagesLoading) {
-        const selectedVillage = villagesData.find((v) => v.id === villageId);
-        if (selectedVillage) {
-          return `${selectedVillage.name}, Kec. ${selectedVillage.district?.name}, ${selectedVillage.district?.regency?.name}`;
-        }
-      }
-      if (villagesError) {
-        return "Gagal memuat Desa";
-      }
-      return "Pilih Desa";
-    },
-    getBuyerButtonLabel: () => {
-      if (mode === "edit") {
-        if (isInitialNamesLoading) {
-          return (
-            <>
-              <LoaderCircle className="h-4 w-4 animate-spin mr-2" />
-              Memuat Pembeli...
-            </>
-          );
-        }
-        if (buyerId && buyersData && buyersData?.length && !isBuyersLoading) {
-          const selectedBuyer = buyersData.find((b) => b.id === buyerId);
-          if (selectedBuyer) {
-            return `${selectedBuyer.full_name}`;
-          }
-        }
-        return initialBuyerName ? initialBuyerName : "Pilih Pembeli";
-      }
-      if (!buyerId) {
-        return "Pilih Pembeli";
-      }
-      if (buyersData && buyersData?.length && !isBuyersLoading) {
-        const selectedBuyer = buyersData.find((b) => b.id === buyerId);
-        if (selectedBuyer) {
-          return `${selectedBuyer.full_name}`;
-        }
-      }
-      if (buyersError) {
-        return "Gagal memuat Pembeli";
-      }
-      return "Pilih Pembeli";
-    },
+    getVillageButtonLabel,
+    getBuyerButtonLabel,
+    isSubmitting,
   };
 };
 

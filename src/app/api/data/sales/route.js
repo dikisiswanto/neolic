@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getSales } from "@/lib/queries/sales";
+import { getSales, createSaleData } from "@/lib/queries/sales";
 
 export async function GET(req) {
   try {
@@ -32,5 +32,46 @@ export async function GET(req) {
     );
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function POST(request) {
+  try {
+    const salesData = await request.json();
+
+    const errors = {};
+
+    if (!salesData.transactionDate) {
+      errors.transactionDate = "Tanggal Transaksi wajib diisi.";
+    }
+    if (!salesData.domainURL) {
+      errors.domainURL = "Domain URL wajib diisi.";
+    }
+    if (!salesData.villageId) {
+      errors.villageId = "Desa wajib dipilih.";
+    }
+    if (!salesData.productId) {
+      errors.productId = "Nama Produk wajib dipilih.";
+    }
+    if (!salesData.buyerId) {
+      errors.buyerId = "Nama Pembeli wajib dipilih.";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return NextResponse.json({ errors }, { status: 400 });
+    }
+
+    const newSales = await createSaleData(salesData);
+
+    return NextResponse.json(
+      { message: "Data penjualan berhasil disimpan", data: newSales },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Terjadi kesalahan:", error);
+    return NextResponse.error({
+      message: "Gagal menyimpan data penjualan",
+      status: 500,
+    });
   }
 }

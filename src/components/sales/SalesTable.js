@@ -1,5 +1,11 @@
-import { useState, useEffect } from "react";
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useSales } from "@/hooks/sales/useSales";
+import { useProducts } from "@/hooks/products/useProducts";
+import useExportCSV from "@/hooks/useExportCSV";
+import { useSalesDataMutation } from "@/hooks/sales/useSalesDataMutation";
 import {
   Table,
   TableHeader,
@@ -18,6 +24,7 @@ import {
   CalendarIcon,
   Download,
   X,
+  LoaderCircle,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import {
@@ -27,8 +34,6 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import useExportCSV from "@/hooks/useExportCSV";
-import { useSales } from "@/hooks/sales/useSales";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -37,7 +42,17 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import { useProducts } from "@/hooks/products/useProducts";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function SalesTable({ onEditClick, refreshTrigger }) {
   const [page, setPage] = useState(1);
@@ -48,6 +63,8 @@ export default function SalesTable({ onEditClick, refreshTrigger }) {
   const [sort, setSort] = useState("purchased_at");
   const [order, setOrder] = useState("desc");
   const [productId, setProductId] = useState("");
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [saleIdToDelete, setSaleIdToDelete] = useState(null);
 
   const debouncedSearch = useDebounce(search, 500);
   const debouncedStartDate = useDebounce(startDate, 500);
@@ -76,8 +93,10 @@ export default function SalesTable({ onEditClick, refreshTrigger }) {
     error: productsError,
   } = useProducts({ pageSize: 10 });
 
-  const pageSizeOptions = [10, 15, 20, 25, 50, 100, 500, 1000];
   const { handleExportCSV } = useExportCSV();
+  const { mutateSalesData, isLoading: isDeleting } = useSalesDataMutation();
+
+  const pageSizeOptions = [10, 15, 20, 25, 50, 100, 500, 1000];
 
   const changeSortOrder = (sortValue, orderValue) => {
     setSort(sortValue);
@@ -94,6 +113,29 @@ export default function SalesTable({ onEditClick, refreshTrigger }) {
     setEndDate("");
     setPage(1);
   };
+
+  const handleDeleteConfirmation = useCallback((saleId) => {
+    setSaleIdToDelete(saleId);
+    setIsDeleteDialogOpen(true);
+  }, []);
+
+  const handleDelete = useCallback(async () => {
+    setIsDeleteDialogOpen(false);
+    if (saleIdToDelete) {
+      try {
+        await mutateSalesData({ mode: "delete", id: saleIdToDelete });
+        setSaleIdToDelete(null);
+        refetch();
+      } catch (deleteError) {
+        console.error("Error deleting sale data:", deleteError);
+      }
+    }
+  }, [mutateSalesData, saleIdToDelete, refetch]);
+
+  const handleCancelDelete = useCallback(() => {
+    setIsDeleteDialogOpen(false);
+    setSaleIdToDelete(null);
+  }, []);
 
   return (
     <section className="py-4 bg-white">
@@ -327,11 +369,42 @@ export default function SalesTable({ onEditClick, refreshTrigger }) {
                 <TableCell>{sale.buyer?.full_name}</TableCell>
                 <TableCell className="inline-flex gap-2">
                   <Button onClick={() => onEditClick(sale)}>
-                    <Edit size={10} />
+                    <Edit size={16} />
                   </Button>
-                  <Button variant="destructive">
-                    <Trash2 />
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="destructive"
+                        disabled={isDeleting}
+                        onClick={() => handleDeleteConfirmation(sale.id)}
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Konfirmasi Hapus</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Apakah Anda yakin ingin menghapus data penjualan ini?
+                          Tindakan ini tidak dapat dibatalkan.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel onClick={handleCancelDelete}>
+                          Batal
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                          disabled={isDeleting}
+                          onClick={handleDelete}
+                        >
+                          Hapus
+                          {isDeleting && (
+                            <LoaderCircle className="inline-block ml-2 h-4 w-4 animate-spin" />
+                          )}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </TableCell>
               </TableRow>
             ))

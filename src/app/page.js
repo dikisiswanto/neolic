@@ -23,7 +23,7 @@ export default function Home() {
           className="mt-5 px-6 py-2"
           onClick={() => router.push("/login")}
         >
-          Masuk
+          Menuju Dashboard
         </Button>
       </motion.div>
     </div>

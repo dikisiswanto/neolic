@@ -28,16 +28,16 @@ function useSalesDialogForm() {
     if (!productId) errors.productId = "Nama Produk wajib dipilih.";
     if (!buyerId) errors.buyerId = "Nama Pembeli wajib dipilih.";
     setFormErrors(errors);
-    return Object.keys(errors).length === 0; // Return true jika tidak ada error
+    return Object.keys(errors).length === 0;
   }, [transactionDate, domainURL, villageId, productId, buyerId]);
 
   const getSalesData = useCallback(() => {
     return {
-      transaction_date: format(transactionDate, "yyyy-MM-dd"),
-      domain_url: domainURL,
-      village_id: villageId,
-      product_id: productId,
-      buyer_id: buyerId,
+      transactionDate: format(transactionDate, "yyyy-MM-dd"),
+      domainURL,
+      villageId,
+      productId,
+      buyerId,
     };
   }, [transactionDate, domainURL, villageId, productId, buyerId]);
 

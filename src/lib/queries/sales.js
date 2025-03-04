@@ -70,3 +70,74 @@ export async function getSales({
 
   return { data, count };
 }
+
+export const createSaleData = async (salesData) => {
+  try {
+    const { data, error } = await supabase
+      .from("purchases")
+      .insert([
+        {
+          purchased_at: salesData.transactionDate,
+          domain_url: salesData.domainURL,
+          village_id: salesData.villageId,
+          product_id: salesData.productId,
+          buyer_id: salesData.buyerId,
+        },
+      ])
+      .select();
+
+    if (error) {
+      console.error("Supabase error creating sales data:", error);
+      throw error;
+    }
+
+    return data ? data[0] : null;
+  } catch (error) {
+    console.error("Error in createSaleData Supabase query:", error);
+    throw error;
+  }
+};
+
+export const updateSaleData = async (id, salesData) => {
+  try {
+    const { data, error } = await supabase
+      .from("purchases")
+      .update({
+        purchased_at: salesData.transactionDate,
+        domain_url: salesData.domainURL,
+        village_id: salesData.villageId,
+        product_id: salesData.productId,
+        buyer_id: salesData.buyerId,
+      })
+      .eq("id", id)
+      .select();
+
+    if (error) {
+      console.error("Supabase error updating sales data:", error);
+      throw error;
+    }
+
+    return data ? data[0] : null;
+  } catch (error) {
+    console.error("Error in updateSaleData Supabase query:", error);
+    throw error;
+  }
+};
+
+export async function deleteSale(id) {
+  try {
+    const { error } = await supabase.from("purchases").delete().eq("id", id);
+
+    if (error) {
+      console.error("Supabase delete error in deleteSaleByIdSupabase:", error);
+      throw new Error(
+        `Failed to delete sale data from Supabase: ${error.message}`
+      );
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error in deleteSaleByIdSupabase:", error);
+    throw error;
+  }
+}

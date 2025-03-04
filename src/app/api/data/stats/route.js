@@ -1,10 +1,24 @@
 import { NextResponse } from "next/server";
-import { getDashboardData } from "@/lib/queries/stats";
+import {
+  getDashboardData,
+  getMonthlySalesData,
+  getSalesPerProvinceData,
+} from "@/lib/queries/stats";
 
 export async function GET() {
   try {
-    const data = await getDashboardData();
-    return NextResponse.json(data);
+    const [dashboardData, monthlySalesData, salesPerProvinceData] =
+      await Promise.all([
+        getDashboardData(),
+        getMonthlySalesData(),
+        getSalesPerProvinceData(),
+      ]);
+
+    return NextResponse.json({
+      ...dashboardData,
+      monthlySalesData,
+      salesPerProvinceData,
+    });
   } catch (error) {
     console.error("Error fetching stats:", error);
     return NextResponse.json(

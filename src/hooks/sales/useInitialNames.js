@@ -6,7 +6,7 @@ import { useBuyerById } from "@/hooks/buyers/useBuyerById";
 export const useInitialNames = (mode, initialSalesData) => {
   const [initialVillageName, setInitialVillageName] = useState(null);
   const [initialBuyerName, setInitialBuyerName] = useState(null);
-  const [isInitialNamesLoading, setIsInitialNamesLoading] = useState(false);
+  const [isInitialNamesLoading, setIsInitialNamesLoading] = useState(true);
 
   const { data: villageData, isLoading: isVillageDataLoading } = useVillageById(
     initialSalesData?.village_id
