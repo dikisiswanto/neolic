@@ -1,4 +1,4 @@
-import supabase from "@/lib/supabase";
+import supabase from '@/lib/supabase';
 
 const getFirstAndLastDayOfMonth = () => {
   const date = new Date();
@@ -9,7 +9,7 @@ const getFirstAndLastDayOfMonth = () => {
 };
 
 const getCount = async (table, filters = {}) => {
-  let query = supabase.from(table).select("id", { count: "exact" });
+  let query = supabase.from(table).select('id', { count: 'exact' });
 
   Object.entries(filters).forEach(([key, value]) => {
     query = query[key](...value);
@@ -23,14 +23,14 @@ const getDashboardData = async () => {
   const { firstDay, lastDay } = getFirstAndLastDayOfMonth();
 
   const queries = [
-    getCount("purchases", {
-      neq: ["status", 0],
-      gte: ["purchased_at", firstDay],
-      lte: ["purchased_at", lastDay],
+    getCount('purchases', {
+      neq: ['status', 0],
+      gte: ['purchased_at', firstDay],
+      lte: ['purchased_at', lastDay],
     }),
-    getCount("purchases"),
-    getCount("products"),
-    getCount("buyers"),
+    getCount('purchases'),
+    getCount('products'),
+    getCount('buyers'),
   ];
 
   const [currentMonthPurchase, totalPurchase, totalProducts, totalBuyers] =
@@ -39,15 +39,15 @@ const getDashboardData = async () => {
   return { currentMonthPurchase, totalPurchase, totalProducts, totalBuyers };
 };
 
-export async function getMonthlySalesData() {
+const getMonthlySalesData = async () => {
   try {
     const { data, error } = await supabase
-      .from("monthly_sales_stats_mv")
-      .select("sale_year, sale_month, sales_count");
+      .from('monthly_sales_stats_mv')
+      .select('sale_year, sale_month, sales_count');
 
     if (error) {
       console.error(
-        "Supabase error saat mengambil data dari materialized view monthly_sales_stats_mv",
+        'Supabase error saat mengambil data dari materialized view monthly_sales_stats_mv',
         error
       );
       throw error;
@@ -55,36 +55,27 @@ export async function getMonthlySalesData() {
 
     return data;
   } catch (error) {
-    console.error(
-      "Terjadi kesalahan dalam fungsi getMonthlySalesData (direct MV query):",
-      error
-    );
+    console.error('Terjadi kesalahan dalam fungsi getMonthlySalesData (direct MV query):', error);
     throw error;
   }
-}
+};
 
-export async function getSalesPerProvinceData() {
+const getSalesPerProvinceData = async () => {
   try {
     const { data, error } = await supabase
-      .from("sales_per_province_mv")
-      .select("province_name, sales_count");
+      .from('sales_per_province_mv')
+      .select('province_name, sales_count');
 
     if (error) {
-      console.error(
-        "Supabase error saat mengambil data penjualan per provinsi:",
-        error
-      );
+      console.error('Supabase error saat mengambil data penjualan per provinsi:', error);
       throw error;
     }
 
     return data;
   } catch (error) {
-    console.error(
-      "Terjadi kesalahan dalam fungsi getSalesPerProvinceData:",
-      error
-    );
+    console.error('Terjadi kesalahan dalam fungsi getSalesPerProvinceData:', error);
     throw error;
   }
-}
+};
 
 export { getDashboardData, getMonthlySalesData, getSalesPerProvinceData };

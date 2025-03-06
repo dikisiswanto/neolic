@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useState, useRef, useCallback, useEffect, useMemo } from "react";
-import { useDebounce } from "@/hooks/useDebounce";
-import { useVillages } from "@/hooks/villages/useVillages";
-import { useBuyers } from "@/hooks/buyers/useBuyers";
-import { useProducts } from "@/hooks/products/useProducts";
-import useSalesDialogForm from "@/hooks/sales/useSalesDialogForm";
-import { useSalesDataMutation } from "@/hooks/sales/useSalesDataMutation";
-import { useInitialNames } from "@/hooks/sales/useInitialNames";
-import { LoaderCircle } from "lucide-react";
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useVillages } from '@/hooks/villages/useVillages';
+import { useBuyers } from '@/hooks/buyers/useBuyers';
+import { useProducts } from '@/hooks/products/useProducts';
+import useSalesDialogForm from '@/hooks/sales/useSalesDialogForm';
+import { useSalesDataMutation } from '@/hooks/sales/useSalesDataMutation';
+import { useInitialNames } from '@/hooks/sales/useInitialNames';
+import { LoaderCircle } from 'lucide-react';
 
 const useManageSalesDialogLogic = ({
   open,
@@ -35,15 +35,16 @@ const useManageSalesDialogLogic = ({
     getSalesData,
   } = useSalesDialogForm();
 
-  const { initialVillageName, initialBuyerName, isInitialNamesLoading } =
-    useInitialNames(mode, initialSalesData);
+  const { initialVillageName, initialBuyerName, isInitialNamesLoading } = useInitialNames(
+    mode,
+    initialSalesData
+  );
 
   const { mutateSalesData, isLoading: isSubmitting } = useSalesDataMutation();
 
-  const [villageSearchTerm, setVillageSearchTerm] = useState("");
+  const [villageSearchTerm, setVillageSearchTerm] = useState('');
   const debouncedVillageSearchTerm = useDebounce(villageSearchTerm, 300);
-  const [isVillageCommandDialogOpen, setIsVillageCommandDialogOpen] =
-    useState(false);
+  const [isVillageCommandDialogOpen, setIsVillageCommandDialogOpen] = useState(false);
   const villageSearchInputRef = useRef(null);
   const {
     data: villagesQueryData,
@@ -69,10 +70,9 @@ const useManageSalesDialogLogic = ({
     [setVillageId]
   );
 
-  const [buyerSearchTerm, setBuyerSearchTerm] = useState("");
+  const [buyerSearchTerm, setBuyerSearchTerm] = useState('');
   const debouncedBuyerSearchTerm = useDebounce(buyerSearchTerm, 300);
-  const [isBuyerCommandDialogOpen, setIsBuyerCommandDialogOpen] =
-    useState(false);
+  const [isBuyerCommandDialogOpen, setIsBuyerCommandDialogOpen] = useState(false);
   const buyerSearchInputRef = useRef(null);
   const {
     data: buyersQueryData,
@@ -119,16 +119,16 @@ const useManageSalesDialogLogic = ({
 
       try {
         let newSalesData;
-        if (mode === "add") {
-          newSalesData = await mutateSalesData({ mode: "add", salesData });
-          console.log("Sales data created successfully:", newSalesData);
-        } else if (mode === "edit" && initialSalesData) {
+        if (mode === 'add') {
+          newSalesData = await mutateSalesData({ mode: 'add', salesData });
+          console.log('Sales data created successfully:', newSalesData);
+        } else if (mode === 'edit' && initialSalesData) {
           newSalesData = await mutateSalesData({
-            mode: "edit",
+            mode: 'edit',
             salesData,
             id: initialSalesData.id,
           });
-          console.log("Sales data updated successfully:", newSalesData);
+          console.log('Sales data updated successfully:', newSalesData);
         }
 
         onOpenChange(false, newSalesData);
@@ -136,13 +136,15 @@ const useManageSalesDialogLogic = ({
         resetForm();
       } catch (error) {
         console.error(`Error submitting sales data (${mode} mode):`, error);
-        if (typeof error === "object" && error !== null && error.errors) {
+        if (typeof error === 'object' && error !== null && error.errors) {
           setFormErrors(error.errors);
         } else {
-          setFormErrors((prevState) => ({
-            ...prevState,
-            submission: `Failed to ${mode === "edit" ? "update" : "create"} sales data.`,
-          }));
+          setFormErrors((prevState) => {
+            return {
+              ...prevState,
+              submission: `Failed to ${mode === 'edit' ? 'update' : 'create'} sales data.`,
+            };
+          });
         }
       }
     },
@@ -166,13 +168,13 @@ const useManageSalesDialogLogic = ({
   }, [onOpenChange, onDialogClose, resetForm]);
 
   useEffect(() => {
-    if (mode === "edit" && initialSalesData) {
+    if (mode === 'edit' && initialSalesData) {
       setTransactionDate(new Date(initialSalesData.purchased_at));
       setDomainURL(initialSalesData.domain_url);
       setProductId(initialSalesData.product_id);
       setBuyerId(initialSalesData.buyer_id);
       setVillageId(initialSalesData.village_id);
-    } else if (mode === "add" && open) {
+    } else if (mode === 'add' && open) {
       resetForm();
     }
   }, [
@@ -188,7 +190,7 @@ const useManageSalesDialogLogic = ({
   ]);
 
   const getVillageButtonLabel = useCallback(() => {
-    if (mode === "edit") {
+    if (mode === 'edit') {
       if (isInitialNamesLoading) {
         return (
           <>
@@ -197,32 +199,31 @@ const useManageSalesDialogLogic = ({
           </>
         );
       }
-      if (
-        villageId &&
-        villagesData &&
-        villagesData?.length &&
-        !isVillagesLoading
-      ) {
-        const selectedVillage = villagesData.find((v) => v.id === villageId);
+      if (villageId && villagesData && villagesData?.length && !isVillagesLoading) {
+        const selectedVillage = villagesData.find((v) => {
+          return v.id === villageId;
+        });
         if (selectedVillage) {
           return `${selectedVillage.name}, Kec. ${selectedVillage.district?.name}, ${selectedVillage.district?.regency?.name}`;
         }
       }
-      return initialVillageName ? `${initialVillageName}` : "Pilih Desa";
+      return initialVillageName ? `${initialVillageName}` : 'Pilih Desa';
     }
     if (!villageId) {
-      return "Pilih Desa";
+      return 'Pilih Desa';
     }
     if (villagesData && villagesData?.length && !isVillagesLoading) {
-      const selectedVillage = villagesData.find((v) => v.id === villageId);
+      const selectedVillage = villagesData.find((v) => {
+        return v.id === villageId;
+      });
       if (selectedVillage) {
         return `${selectedVillage.name}, Kec. ${selectedVillage.district?.name}, ${selectedVillage.district?.regency?.name}`;
       }
     }
     if (villagesError) {
-      return "Gagal memuat Desa";
+      return 'Gagal memuat Desa';
     }
-    return "Pilih Desa";
+    return 'Pilih Desa';
   }, [
     mode,
     isInitialNamesLoading,
@@ -234,7 +235,7 @@ const useManageSalesDialogLogic = ({
   ]);
 
   const getBuyerButtonLabel = useCallback(() => {
-    if (mode === "edit") {
+    if (mode === 'edit') {
       if (isInitialNamesLoading) {
         return (
           <>
@@ -244,26 +245,30 @@ const useManageSalesDialogLogic = ({
         );
       }
       if (buyerId && buyersData && buyersData?.length && !isBuyersLoading) {
-        const selectedBuyer = buyersData.find((b) => b.id === buyerId);
+        const selectedBuyer = buyersData.find((b) => {
+          return b.id === buyerId;
+        });
         if (selectedBuyer) {
           return `${selectedBuyer.full_name}`;
         }
       }
-      return initialBuyerName ? initialBuyerName : "Pilih Pembeli";
+      return initialBuyerName ? initialBuyerName : 'Pilih Pembeli';
     }
     if (!buyerId) {
-      return "Pilih Pembeli";
+      return 'Pilih Pembeli';
     }
     if (buyersData && buyersData?.length && !isBuyersLoading) {
-      const selectedBuyer = buyersData.find((b) => b.id === buyerId);
+      const selectedBuyer = buyersData.find((b) => {
+        return b.id === buyerId;
+      });
       if (selectedBuyer) {
         return `${selectedBuyer.full_name}`;
       }
     }
     if (buyersError) {
-      return "Gagal memuat Pembeli";
+      return 'Gagal memuat Pembeli';
     }
-    return "Pilih Pembeli";
+    return 'Pilih Pembeli';
   }, [
     mode,
     isInitialNamesLoading,
@@ -316,12 +321,11 @@ const useManageSalesDialogLogic = ({
     productsError,
     handleSubmit,
     handleDialogCloseButtonClick,
-    dialogTitle:
-      mode === "edit" ? "Edit Data Penjualan" : "Tambah Data Penjualan Baru",
+    dialogTitle: mode === 'edit' ? 'Edit Data Penjualan' : 'Tambah Data Penjualan Baru',
     dialogDescription:
-      mode === "edit"
-        ? "Edit formulir berikut untuk memperbarui data penjualan."
-        : "Isi formulir berikut untuk menambahkan data penjualan.",
+      mode === 'edit'
+        ? 'Edit formulir berikut untuk memperbarui data penjualan.'
+        : 'Isi formulir berikut untuk menambahkan data penjualan.',
     mode,
     getVillageButtonLabel,
     getBuyerButtonLabel,

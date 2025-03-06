@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from '@supabase/supabase-js';
 
 // Inisialisasi Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

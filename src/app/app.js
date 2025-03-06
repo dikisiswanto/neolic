@@ -1,12 +1,12 @@
-import Navbar from "@/components/ui/navbar";
-import { useEffect, useTransition } from "react";
-import { usePathname } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
-import { startProgress, stopProgress } from "@/lib/progress";
+import Navbar from '@/components/ui/navbar';
+import { useEffect, useTransition } from 'react';
+import { usePathname } from 'next/navigation';
+import { AnimatePresence, motion } from 'framer-motion';
+import { startProgress, stopProgress } from '@/lib/progress';
 
 export function App({ children }) {
   const pathname = usePathname();
-  const [isPending, startTransition] = useTransition();
+  const [_, startTransition] = useTransition();
 
   useEffect(() => {
     startProgress();

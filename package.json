@@ -7,8 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "lint:fix": "next lint . --fix",
-    "format": "prettier --write ."
+    "lint:fix": "next lint --fix",
+    "format": "prettier --write .",
+    "prepare": "husky"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.2",
@@ -16,6 +17,7 @@
     "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-label": "^2.1.2",
     "@radix-ui/react-popover": "^1.1.6",
+    "@radix-ui/react-scroll-area": "^1.2.3",
     "@radix-ui/react-select": "^2.1.6",
     "@radix-ui/react-slot": "^1.1.2",
     "@supabase/supabase-js": "^2.49.1",
@@ -43,12 +45,15 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
+    "@eslint/eslintrc": "^3.3.0",
+    "@eslint/js": "^9.21.0",
     "@tailwindcss/postcss": "^4",
     "eslint": "^9.21.0",
-    "eslint-config-next": "^15.2.0",
+    "eslint-config-next": "^15.2.1",
     "eslint-config-prettier": "^10.0.2",
+    "eslint-plugin-next": "^0.0.0",
     "eslint-plugin-prettier": "^5.2.3",
+    "husky": "^9.1.7",
     "prettier": "^3.5.2",
     "tailwindcss": "^4"
   },

@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 /**
  * Custom hook untuk debounce nilai.
@@ -16,7 +16,9 @@ export function useDebounce(value, delay = 500) {
       setDebouncedValue(value);
     }, delay);
 
-    return () => clearTimeout(handler);
+    return () => {
+      return clearTimeout(handler);
+    };
   }, [value, delay]);
 
   return debouncedValue;

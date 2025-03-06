@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
-import { deleteSale, updateSaleData } from "@/lib/queries/sales";
+import { NextResponse } from 'next/server';
+import { deleteSale, updateSaleData } from '@/lib/queries/sales';
 
 export async function PUT(request, { params }) {
   const { id } = await params;
@@ -10,19 +10,19 @@ export async function PUT(request, { params }) {
     const errors = {};
 
     if (!salesData.transactionDate) {
-      errors.transactionDate = "Tanggal Transaksi wajib diisi.";
+      errors.transactionDate = 'Tanggal Transaksi wajib diisi.';
     }
     if (!salesData.domainURL) {
-      errors.domainURL = "Domain URL wajib diisi.";
+      errors.domainURL = 'Domain URL wajib diisi.';
     }
     if (!salesData.villageId) {
-      errors.villageId = "Desa wajib dipilih.";
+      errors.villageId = 'Desa wajib dipilih.';
     }
     if (!salesData.productId) {
-      errors.productId = "Nama Produk wajib dipilih.";
+      errors.productId = 'Nama Produk wajib dipilih.';
     }
     if (!salesData.buyerId) {
-      errors.buyerId = "Nama Pembeli wajib dipilih.";
+      errors.buyerId = 'Nama Pembeli wajib dipilih.';
     }
 
     if (Object.keys(errors).length > 0) {
@@ -33,19 +33,19 @@ export async function PUT(request, { params }) {
 
     if (!updatedSales) {
       return NextResponse.json({
-        message: "Data penjualan gagal disimpan",
+        message: 'Data penjualan gagal disimpan',
         status: 404,
       });
     }
 
     return NextResponse.json(
-      { message: "Data penjualan berhasil disimpan", data: updatedSales },
+      { message: 'Data penjualan berhasil disimpan', data: updatedSales },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Terjadi kesalahan:", error);
+    console.error('Terjadi kesalahan:', error);
     return NextResponse.error({
-      message: "Data penjualan gagal disimpan",
+      message: 'Data penjualan gagal disimpan',
       status: 500,
     });
   }
@@ -57,20 +57,17 @@ export async function DELETE(req, { params }) {
 
     if (!id) {
       return NextResponse.badRequest({
-        message: "Aksi delete membutuhkan ID penjualan",
+        message: 'Aksi delete membutuhkan ID penjualan',
       });
     }
 
     await deleteSale(id);
 
-    return NextResponse.json(
-      { message: "Data penjualan berhasil dihapus." },
-      { status: 200 }
-    );
+    return NextResponse.json({ message: 'Data penjualan berhasil dihapus.' }, { status: 200 });
   } catch (error) {
-    console.error("Error deleting sale data:", error);
+    console.error('Error deleting sale data:', error);
     return NextResponse.internalServerError({
-      message: "Data penjualan gagal dihapus",
+      message: 'Data penjualan gagal dihapus',
       error: error.message,
     });
   }

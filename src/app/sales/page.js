@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { App } from "../app";
-import SalesTable from "@/components/sales/SalesTable";
-import ManageSalesDialog from "@/components/sales/ManageSalesDialog";
+import { App } from '../app';
+import SalesTable from '@/components/sales/SalesTable';
+import ManageSalesDialog from '@/components/sales/ManageSalesDialog';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -10,9 +10,9 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { useState, useCallback } from "react";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/breadcrumb';
+import { useState, useCallback } from 'react';
+import { Button } from '@/components/ui/button';
 
 export default function SalesPage() {
   const [isDialogOpenForAdd, setIsDialogOpenForAdd] = useState(false);
@@ -28,30 +28,30 @@ export default function SalesPage() {
   const handleDialogClose = useCallback(() => {
     setIsDialogOpenForAdd(false);
     setIsEditDialogOpen(false);
-    setRefreshSalesTable((prev) => !prev);
+    setRefreshSalesTable((prev) => {
+      return !prev;
+    });
   }, []);
 
-  const handleDialogAddOpenChange = useCallback(
-    (newOpenState, submittedSalesData) => {
-      setIsDialogOpenForAdd(newOpenState);
-      if (!newOpenState && submittedSalesData) {
-        console.log("Data penjualan baru disubmit:", submittedSalesData);
-        setRefreshSalesTable((prev) => !prev);
-      }
-    },
-    []
-  );
+  const handleDialogAddOpenChange = useCallback((newOpenState, submittedSalesData) => {
+    setIsDialogOpenForAdd(newOpenState);
+    if (!newOpenState && submittedSalesData) {
+      console.log('Data penjualan baru disubmit:', submittedSalesData);
+      setRefreshSalesTable((prev) => {
+        return !prev;
+      });
+    }
+  }, []);
 
-  const handleDialogEditOpenChange = useCallback(
-    (newOpenState, submittedSalesData) => {
-      setIsEditDialogOpen(newOpenState);
-      if (!newOpenState && submittedSalesData) {
-        console.log("Data penjualan diupdate:", submittedSalesData);
-        setRefreshSalesTable((prev) => !prev);
-      }
-    },
-    []
-  );
+  const handleDialogEditOpenChange = useCallback((newOpenState, submittedSalesData) => {
+    setIsEditDialogOpen(newOpenState);
+    if (!newOpenState && submittedSalesData) {
+      console.log('Data penjualan diupdate:', submittedSalesData);
+      setRefreshSalesTable((prev) => {
+        return !prev;
+      });
+    }
+  }, []);
 
   return (
     <App>
@@ -68,7 +68,11 @@ export default function SalesPage() {
           </BreadcrumbList>
         </Breadcrumb>
         <h1 className="text-2xl font-bold mb-4">Data Penjualan</h1>
-        <Button onClick={() => setIsDialogOpenForAdd(true)}>
+        <Button
+          onClick={() => {
+            return setIsDialogOpenForAdd(true);
+          }}
+        >
           + Tambah Data Penjualan
         </Button>
       </div>
@@ -88,10 +92,7 @@ export default function SalesPage() {
         onDialogClose={handleDialogClose}
       />
 
-      <SalesTable
-        onEditClick={handleEditClick}
-        refreshTrigger={refreshSalesTable}
-      />
+      <SalesTable onEditClick={handleEditClick} refreshTrigger={refreshSalesTable} />
     </App>
   );
 }

@@ -1,16 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 export function useProducts({
   page = 1,
   pageSize = 10,
-  sort = "created_at",
-  order = "desc",
-  search = "",
+  sort = 'created_at',
+  order = 'desc',
+  search = '',
   isFetch = true,
 }) {
   return useQuery({
-    queryKey: ["products", page, pageSize, sort, order, search],
+    queryKey: ['products', page, pageSize, sort, order, search],
     queryFn: async () => {
       try {
         const res = await fetch(
@@ -18,21 +18,21 @@ export function useProducts({
         );
 
         if (!res.ok) {
-          throw new Error(`Gagal memuat data produk.`);
+          throw new Error('Gagal memuat data produk.');
         }
 
         const json = await res.json();
 
         if (json.data && json.data.length === 0) {
-          toast.info("Produk tidak ditemukan.", {
+          toast.info('Produk tidak ditemukan.', {
             duration: 5000,
           });
         }
 
         return json;
       } catch (error) {
-        console.error("Terjadi kesalahan saat mengambil data produk:", error);
-        toast.error("Gagal memuat produk.", {
+        console.error('Terjadi kesalahan saat mengambil data produk:', error);
+        toast.error('Gagal memuat produk.', {
           duration: 5000,
         });
         throw error;
@@ -41,8 +41,8 @@ export function useProducts({
     keepPreviousData: true,
     staleTime: 5000,
     enabled: isFetch,
-    onError: (error) => {
-      toast.error("Gagal memuat produk.", {
+    onError: () => {
+      toast.error('Gagal memuat produk.', {
         duration: 5000,
       });
     },

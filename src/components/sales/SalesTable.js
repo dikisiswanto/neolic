@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { useDebounce } from "@/hooks/useDebounce";
-import { useSales } from "@/hooks/sales/useSales";
-import { useProducts } from "@/hooks/products/useProducts";
-import useExportCSV from "@/hooks/useExportCSV";
-import { useSalesDataMutation } from "@/hooks/sales/useSalesDataMutation";
+import { useState, useEffect, useCallback } from 'react';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useSales } from '@/hooks/sales/useSales';
+import { useProducts } from '@/hooks/products/useProducts';
+import useExportCSV from '@/hooks/useExportCSV';
+import { useSalesDataMutation } from '@/hooks/sales/useSalesDataMutation';
 import {
   Table,
   TableHeader,
@@ -13,9 +13,9 @@ import {
   TableHead,
   TableRow,
   TableCell,
-} from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { Pagination } from "@/components/ui/pagination";
+} from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
+import { Pagination } from '@/components/ui/pagination';
 import {
   Edit,
   Trash2,
@@ -25,23 +25,14 @@ import {
   Download,
   X,
   LoaderCircle,
-} from "lucide-react";
-import { Button } from "../ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from "@/components/ui/select";
-import { cn } from "@/lib/utils";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { format } from "date-fns";
-import { id } from "date-fns/locale";
+} from 'lucide-react';
+import { Button } from '../ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -52,18 +43,18 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog';
 
 export default function SalesTable({ onEditClick, refreshTrigger }) {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [search, setSearch] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [sort, setSort] = useState("purchased_at");
-  const [order, setOrder] = useState("desc");
-  const [productId, setProductId] = useState("");
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [sort, setSort] = useState('purchased_at');
+  const [order, setOrder] = useState('desc');
+  const [productId, setProductId] = useState('');
+  const [, setIsDeleteDialogOpen] = useState(false);
   const [saleIdToDelete, setSaleIdToDelete] = useState(null);
 
   const debouncedSearch = useDebounce(search, 500);
@@ -72,7 +63,7 @@ export default function SalesTable({ onEditClick, refreshTrigger }) {
   const debounceSort = useDebounce(sort, 500);
   const debounceOrder = useDebounce(order, 500);
 
-  const { data, isLoading, error, refetch } = useSales({
+  const { data, isLoading, _, refetch } = useSales({
     page,
     pageSize,
     search: debouncedSearch,
@@ -105,12 +96,12 @@ export default function SalesTable({ onEditClick, refreshTrigger }) {
   };
 
   const resetStartDate = () => {
-    setStartDate("");
+    setStartDate('');
     setPage(1);
   };
 
   const resetEndDate = () => {
-    setEndDate("");
+    setEndDate('');
     setPage(1);
   };
 
@@ -123,11 +114,11 @@ export default function SalesTable({ onEditClick, refreshTrigger }) {
     setIsDeleteDialogOpen(false);
     if (saleIdToDelete) {
       try {
-        await mutateSalesData({ mode: "delete", id: saleIdToDelete });
+        await mutateSalesData({ mode: 'delete', id: saleIdToDelete });
         setSaleIdToDelete(null);
         refetch();
       } catch (deleteError) {
-        console.error("Error deleting sale data:", deleteError);
+        console.error('Error deleting sale data:', deleteError);
       }
     }
   }, [mutateSalesData, saleIdToDelete, refetch]);
@@ -152,18 +143,14 @@ export default function SalesTable({ onEditClick, refreshTrigger }) {
           <Popover>
             <PopoverTrigger asChild>
               <Button
-                variant={"outline"}
+                variant={'outline'}
                 className={cn(
-                  "max-w-full flex-grow text-left font-normal",
-                  !startDate && "text-muted-foreground"
+                  'max-w-full flex-grow text-left font-normal',
+                  !startDate && 'text-muted-foreground'
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {startDate ? (
-                  format(startDate, "PPP", { locale: id })
-                ) : (
-                  <span>Tanggal Mulai</span>
-                )}
+                {startDate ? format(startDate, 'PPP', { locale: id }) : <span>Tanggal Mulai</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-2" align="start">
@@ -171,7 +158,7 @@ export default function SalesTable({ onEditClick, refreshTrigger }) {
                 mode="single"
                 selected={startDate}
                 onSelect={(date) => {
-                  setStartDate(date ? format(date, "yyyy-MM-dd") : undefined);
+                  setStartDate(date ? format(date, 'yyyy-MM-dd') : undefined);
                   setPage(1);
                 }}
                 initialFocus
@@ -182,8 +169,8 @@ export default function SalesTable({ onEditClick, refreshTrigger }) {
           {startDate && (
             <Button
               className="w-auto inline-block"
-              variant={"outline"}
-              size={"sm"}
+              variant={'outline'}
+              size={'sm'}
               onClick={resetStartDate}
             >
               <X className="h-4 w-4" />
@@ -194,18 +181,14 @@ export default function SalesTable({ onEditClick, refreshTrigger }) {
           <Popover>
             <PopoverTrigger asChild>
               <Button
-                variant={"outline"}
+                variant={'outline'}
                 className={cn(
-                  "max-w-full flex-grow text-left font-normal",
-                  !endDate && "text-muted-foreground"
+                  'max-w-full flex-grow text-left font-normal',
+                  !endDate && 'text-muted-foreground'
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {endDate ? (
-                  format(endDate, "PPP", { locale: id })
-                ) : (
-                  <span>Tanggal Berakhir</span>
-                )}
+                {endDate ? format(endDate, 'PPP', { locale: id }) : <span>Tanggal Berakhir</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-2" align="start">
@@ -213,7 +196,7 @@ export default function SalesTable({ onEditClick, refreshTrigger }) {
                 mode="single"
                 selected={endDate}
                 onSelect={(date) => {
-                  setEndDate(date ? format(date, "yyyy-MM-dd") : undefined);
+                  setEndDate(date ? format(date, 'yyyy-MM-dd') : undefined);
                   setPage(1);
                 }}
                 initialFocus
@@ -224,8 +207,8 @@ export default function SalesTable({ onEditClick, refreshTrigger }) {
           {endDate && (
             <Button
               className="w-auto inline-block"
-              variant={"outline"}
-              size={"sm"}
+              variant={'outline'}
+              size={'sm'}
               onClick={resetEndDate}
             >
               <X className="h-4 w-4" />
@@ -236,15 +219,16 @@ export default function SalesTable({ onEditClick, refreshTrigger }) {
         <Select
           value={productId}
           onValueChange={(value) => {
-            setProductId(value === "all" ? "" : value);
+            setProductId(value === 'all' ? '' : value);
             setPage(1);
           }}
         >
           <SelectTrigger className="cursor-pointer">
             {productId
-              ? productsData?.data?.find((product) => product.id === productId)
-                  ?.name || "Pilih Produk"
-              : "Semua Produk"}
+              ? productsData?.data?.find((product) => {
+                  return product.id === productId;
+                })?.name || 'Pilih Produk'
+              : 'Semua Produk'}
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Produk</SelectItem>
@@ -257,11 +241,13 @@ export default function SalesTable({ onEditClick, refreshTrigger }) {
                 Error Memuat Produk
               </SelectItem>
             ) : (
-              productsData?.data?.map((product) => (
-                <SelectItem key={product.id} value={product.id}>
-                  {product.name}
-                </SelectItem>
-              ))
+              productsData?.data?.map((product) => {
+                return (
+                  <SelectItem key={product.id} value={product.id}>
+                    {product.name}
+                  </SelectItem>
+                );
+              })
             )}
           </SelectContent>
         </Select>
@@ -278,17 +264,20 @@ export default function SalesTable({ onEditClick, refreshTrigger }) {
             Tampilkan {pageSize} data per halaman
           </SelectTrigger>
           <SelectContent>
-            {pageSizeOptions.map((pageSizeOption) => (
-              <SelectItem
-                key={pageSizeOption}
-                value={pageSizeOption.toString()}
-              >
-                {pageSizeOption} per halaman
-              </SelectItem>
-            ))}
+            {pageSizeOptions.map((pageSizeOption) => {
+              return (
+                <SelectItem key={pageSizeOption} value={pageSizeOption.toString()}>
+                  {pageSizeOption} per halaman
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
-        <Button onClick={() => handleExportCSV(data?.data)}>
+        <Button
+          onClick={() => {
+            return handleExportCSV(data?.data);
+          }}
+        >
           <Download /> Ekspor CSV
         </Button>
       </div>
@@ -302,18 +291,22 @@ export default function SalesTable({ onEditClick, refreshTrigger }) {
               <ArrowUp
                 size={13}
                 className={cn(
-                  "hover:cursor-pointer inline-flex ml-3",
-                  sort === "purchased_at" && order === "asc" && "text-blue-500"
+                  'hover:cursor-pointer inline-flex ml-3',
+                  sort === 'purchased_at' && order === 'asc' && 'text-blue-500'
                 )}
-                onClick={() => changeSortOrder("purchased_at", "asc")}
+                onClick={() => {
+                  return changeSortOrder('purchased_at', 'asc');
+                }}
               />
               <ArrowDown
                 size={13}
                 className={cn(
-                  "hover:cursor-pointer inline-flex",
-                  sort === "purchased_at" && order === "desc" && "text-blue-500"
+                  'hover:cursor-pointer inline-flex',
+                  sort === 'purchased_at' && order === 'desc' && 'text-blue-500'
                 )}
-                onClick={() => changeSortOrder("purchased_at", "desc")}
+                onClick={() => {
+                  return changeSortOrder('purchased_at', 'desc');
+                }}
               />
             </TableHead>
             <TableHead>
@@ -321,18 +314,22 @@ export default function SalesTable({ onEditClick, refreshTrigger }) {
               <ArrowUp
                 size={13}
                 className={cn(
-                  "hover:cursor-pointer inline-flex ml-3",
-                  sort === "domain_url" && order === "asc" && "text-blue-500"
+                  'hover:cursor-pointer inline-flex ml-3',
+                  sort === 'domain_url' && order === 'asc' && 'text-blue-500'
                 )}
-                onClick={() => changeSortOrder("domain_url", "asc")}
+                onClick={() => {
+                  return changeSortOrder('domain_url', 'asc');
+                }}
               />
               <ArrowDown
                 size={13}
                 className={cn(
-                  "hover:cursor-pointer inline-flex",
-                  sort === "domain_url" && order === "desc" && "text-blue-500"
+                  'hover:cursor-pointer inline-flex',
+                  sort === 'domain_url' && order === 'desc' && 'text-blue-500'
                 )}
-                onClick={() => changeSortOrder("domain_url", "desc")}
+                onClick={() => {
+                  return changeSortOrder('domain_url', 'desc');
+                }}
               />
             </TableHead>
             <TableHead>Desa</TableHead>
@@ -352,62 +349,61 @@ export default function SalesTable({ onEditClick, refreshTrigger }) {
               </TableCell>
             </TableRow>
           ) : (
-            data?.data?.map((sale, index) => (
-              <TableRow key={sale.id}>
-                <TableCell>{(page - 1) * pageSize + index + 1}</TableCell>
-                <TableCell>
-                  {new Date(sale.purchased_at).toLocaleDateString()}
-                </TableCell>
-                <TableCell>{sale.domain_url}</TableCell>
-                <TableCell>{sale.village?.name}</TableCell>
-                <TableCell>{sale.village?.district?.name}</TableCell>
-                <TableCell>{sale.village?.district?.regency?.name}</TableCell>
-                <TableCell>
-                  {sale.village?.district?.regency?.province?.name}
-                </TableCell>
-                <TableCell>{sale.product?.name}</TableCell>
-                <TableCell>{sale.buyer?.full_name}</TableCell>
-                <TableCell className="inline-flex gap-2">
-                  <Button onClick={() => onEditClick(sale)}>
-                    <Edit size={16} />
-                  </Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="destructive"
-                        disabled={isDeleting}
-                        onClick={() => handleDeleteConfirmation(sale.id)}
-                      >
-                        <Trash2 size={16} />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Konfirmasi Hapus</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Apakah Anda yakin ingin menghapus data penjualan ini?
-                          Tindakan ini tidak dapat dibatalkan.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel onClick={handleCancelDelete}>
-                          Batal
-                        </AlertDialogCancel>
-                        <AlertDialogAction
+            data?.data?.map((sale, index) => {
+              return (
+                <TableRow key={sale.id}>
+                  <TableCell>{(page - 1) * pageSize + index + 1}</TableCell>
+                  <TableCell>{new Date(sale.purchased_at).toLocaleDateString()}</TableCell>
+                  <TableCell>{sale.domain_url}</TableCell>
+                  <TableCell>{sale.village?.name}</TableCell>
+                  <TableCell>{sale.village?.district?.name}</TableCell>
+                  <TableCell>{sale.village?.district?.regency?.name}</TableCell>
+                  <TableCell>{sale.village?.district?.regency?.province?.name}</TableCell>
+                  <TableCell>{sale.product?.name}</TableCell>
+                  <TableCell>{sale.buyer?.full_name}</TableCell>
+                  <TableCell className="inline-flex gap-2">
+                    <Button
+                      onClick={() => {
+                        return onEditClick(sale);
+                      }}
+                    >
+                      <Edit size={16} />
+                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="destructive"
                           disabled={isDeleting}
-                          onClick={handleDelete}
+                          onClick={() => {
+                            return handleDeleteConfirmation(sale.id);
+                          }}
                         >
-                          Hapus
-                          {isDeleting && (
-                            <LoaderCircle className="inline-block ml-2 h-4 w-4 animate-spin" />
-                          )}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </TableCell>
-              </TableRow>
-            ))
+                          <Trash2 size={16} />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Konfirmasi Hapus</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Apakah Anda yakin ingin menghapus data penjualan ini? Tindakan ini tidak
+                            dapat dibatalkan.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel onClick={handleCancelDelete}>Batal</AlertDialogCancel>
+                          <AlertDialogAction disabled={isDeleting} onClick={handleDelete}>
+                            Hapus
+                            {isDeleting && (
+                              <LoaderCircle className="inline-block ml-2 h-4 w-4 animate-spin" />
+                            )}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </TableCell>
+                </TableRow>
+              );
+            })
           )}
         </TableBody>
       </Table>
@@ -416,7 +412,9 @@ export default function SalesTable({ onEditClick, refreshTrigger }) {
         page={page}
         total={data?.total || 0}
         pageSize={data?.pageSize || 10}
-        onChange={(newPage) => setPage(newPage)}
+        onChange={(newPage) => {
+          return setPage(newPage);
+        }}
       />
     </section>
   );

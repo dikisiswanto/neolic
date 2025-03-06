@@ -1,28 +1,27 @@
-"use client";
+'use client';
 
-import { useEffect, Suspense } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useSession } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
+import { useEffect, Suspense } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { useSession } from 'next-auth/react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { motion } from 'framer-motion';
 
-export default function LoginPage() {
+function LoginPageComponent() {
   const { login, loading } = useAuth();
-  const { data: session, status } = useSession();
+  const { data: _, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
 
-  // Redirect jika sudah login
   useEffect(() => {
-    if (status === "authenticated") {
+    if (status === 'authenticated') {
       router.replace(callbackUrl);
     }
   }, [status, router, callbackUrl]);
 
-  if (status === "loading" || status === "authenticated") {
+  if (status === 'loading' || status === 'authenticated') {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <motion.p
@@ -31,7 +30,7 @@ export default function LoginPage() {
           transition={{
             duration: 0.5,
             repeat: Infinity,
-            repeatType: "reverse",
+            repeatType: 'reverse',
           }}
           className="text-lg font-medium text-gray-700"
         >
@@ -44,7 +43,7 @@ export default function LoginPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
-    login(formData.get("username"), formData.get("password"));
+    login(formData.get('username'), formData.get('password'));
   };
 
   return (
@@ -58,22 +57,20 @@ export default function LoginPage() {
         <h1 className="text-2xl font-bold text-center mb-6">Login</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input name="username" type="text" placeholder="Username" required />
-          <Input
-            type="password"
-            name="password"
-            placeholder="Password"
-            required
-          />
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={loading}
-            aria-live="polite"
-          >
-            {loading ? "Logging in..." : "Login"}
+          <Input type="password" name="password" placeholder="Password" required />
+          <Button type="submit" className="w-full" disabled={loading} aria-live="polite">
+            {loading ? 'Logging in...' : 'Login'}
           </Button>
         </form>
       </motion.div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<p>Memuat laman login...</p>}>
+      <LoginPageComponent />
+    </Suspense>
   );
 }

@@ -1,7 +1,7 @@
-"use client";
-import { useState, useEffect } from "react";
-import { useVillageById } from "@/hooks/villages/useVillageById";
-import { useBuyerById } from "@/hooks/buyers/useBuyerById";
+'use client';
+import { useState, useEffect } from 'react';
+import { useVillageById } from '@/hooks/villages/useVillageById';
+import { useBuyerById } from '@/hooks/buyers/useBuyerById';
 
 export const useInitialNames = (mode, initialSalesData) => {
   const [initialVillageName, setInitialVillageName] = useState(null);
@@ -16,7 +16,7 @@ export const useInitialNames = (mode, initialSalesData) => {
   );
 
   useEffect(() => {
-    if (mode === "edit" && initialSalesData) {
+    if (mode === 'edit' && initialSalesData) {
       setIsInitialNamesLoading(true);
       const fetchInitialData = async () => {
         let villageDisplayName = null;
@@ -25,13 +25,13 @@ export const useInitialNames = (mode, initialSalesData) => {
         if (initialSalesData.village_id && villageData) {
           villageDisplayName = `${villageData?.name}, Kec. ${villageData?.district?.name}, ${villageData?.district?.regency?.name}`;
         } else if (isVillageDataLoading) {
-          villageDisplayName = "Mencari Desa...";
+          villageDisplayName = 'Mencari Desa...';
         }
 
         if (initialSalesData.buyer_id && buyerData) {
           buyerName = buyerData?.full_name;
         } else if (isBuyerDataLoading) {
-          buyerName = "Mencari Pembeli...";
+          buyerName = 'Mencari Pembeli...';
         }
 
         setInitialVillageName(villageDisplayName);
@@ -44,14 +44,7 @@ export const useInitialNames = (mode, initialSalesData) => {
       setInitialVillageName(null);
       setInitialBuyerName(null);
     }
-  }, [
-    mode,
-    initialSalesData,
-    villageData,
-    buyerData,
-    isVillageDataLoading,
-    isBuyerDataLoading,
-  ]);
+  }, [mode, initialSalesData, villageData, buyerData, isVillageDataLoading, isBuyerDataLoading]);
 
   return { initialVillageName, initialBuyerName, isInitialNamesLoading };
 };

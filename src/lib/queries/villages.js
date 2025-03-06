@@ -1,11 +1,11 @@
-import supabase from "@/lib/supabase";
+import supabase from '@/lib/supabase';
 
-export async function getVillages({ search = "", page = 1, pageSize = 10 }) {
+export async function getVillages({ search = '', page = 1, pageSize = 10 }) {
   const startIndex = (page - 1) * pageSize;
   const endIndex = startIndex + pageSize - 1;
 
   let query = supabase
-    .from("villages")
+    .from('villages')
     .select(
       `
           id,
@@ -18,7 +18,7 @@ export async function getVillages({ search = "", page = 1, pageSize = 10 }) {
             )
           )
         `,
-      { count: "exact" }
+      { count: 'exact' }
     )
     .range(startIndex, endIndex);
 
@@ -40,7 +40,7 @@ export async function getVillages({ search = "", page = 1, pageSize = 10 }) {
 export async function getVillageById(id) {
   try {
     const { data, error } = await supabase
-      .from("villages")
+      .from('villages')
       .select(
         `
         id,
@@ -54,16 +54,16 @@ export async function getVillageById(id) {
         )
       `
       )
-      .eq("id", id)
+      .eq('id', id)
       .single();
 
     if (error) {
-      console.error("Supabase error saat getVillageById", error);
+      console.error('Supabase error saat getVillageById', error);
       throw error;
     }
     return data;
   } catch (error) {
-    console.error("Error in getVillageById query:", error);
+    console.error('Error in getVillageById query:', error);
     throw error;
   }
 }

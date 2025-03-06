@@ -1,14 +1,14 @@
-import supabase from "@/lib/supabase";
+import supabase from '@/lib/supabase';
 
 export async function getProducts({
   page = 1,
   pageSize = 10,
-  sort = "created_at",
-  order = "desc",
-  search = "",
+  sort = 'created_at',
+  order = 'desc',
+  search = '',
 }) {
   let query = supabase
-    .from("products")
+    .from('products')
     .select(
       `
         id,
@@ -19,17 +19,14 @@ export async function getProducts({
         serial_number,
         current_version
       `,
-      { count: "exact" }
+      { count: 'exact' }
     )
-    .order(sort, { ascending: order === "asc" })
+    .order(sort, { ascending: order === 'asc' })
     .range((page - 1) * pageSize, page * pageSize - 1);
 
   if (search) {
     const searchQuery = `%${search}%`;
-    query = query.or([
-      `name.ilike.${searchQuery}`,
-      `serial_number.ilike.${searchQuery}`,
-    ]);
+    query = query.or([`name.ilike.${searchQuery}`, `serial_number.ilike.${searchQuery}`]);
   }
 
   const { data, error, count } = await query;
@@ -40,19 +37,15 @@ export async function getProducts({
 
 export async function getProductById(id) {
   try {
-    const { data, error } = await supabase
-      .from("products")
-      .select("*")
-      .eq("id", id)
-      .single();
+    const { data, error } = await supabase.from('products').select('*').eq('id', id).single();
 
     if (error) {
-      console.error("Supabase error saat getProductById", error);
+      console.error('Supabase error saat getProductById', error);
       throw error;
     }
     return data;
   } catch (error) {
-    console.error("Error in getProductById query:", error);
+    console.error('Error in getProductById query:', error);
     throw error;
   }
 }

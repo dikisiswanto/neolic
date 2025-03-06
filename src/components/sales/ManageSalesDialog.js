@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useRef, memo, createRef } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { LoaderCircle } from "lucide-react";
+import { useEffect, useRef, memo, createRef } from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { LoaderCircle } from 'lucide-react';
 import {
   Select,
   SelectTrigger,
   SelectContent,
   SelectItem,
   SelectValue,
-} from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
-import { id } from "date-fns/locale";
+} from '@/components/ui/select';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 import {
   Dialog,
   DialogContent,
@@ -23,12 +23,8 @@ import {
   DialogDescription,
   DialogFooter,
   DialogClose,
-} from "@/components/ui/dialog";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover";
+} from '@/components/ui/dialog';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import {
   Command,
   CommandDialog,
@@ -37,8 +33,8 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
-import useManageSalesDialogLogic from "@/hooks/sales/useManageSalesDialogLogic";
+} from '@/components/ui/command';
+import useManageSalesDialogLogic from '@/hooks/sales/useManageSalesDialogLogic';
 
 const MemoizedVillageCommandItem = memo(
   function VillageCommandItem({ village, onSelect }) {
@@ -46,10 +42,11 @@ const MemoizedVillageCommandItem = memo(
       <CommandItem
         key={village.id}
         value={village.name}
-        onSelect={() => onSelect(village.id)}
+        onSelect={() => {
+          return onSelect(village.id);
+        }}
       >
-        {village.name}, Kec. {village.district?.name},{" "}
-        {village.district?.regency?.name},{" "}
+        {village.name}, Kec. {village.district?.name}, {village.district?.regency?.name},{' '}
         {village.district?.regency?.province?.name}
       </CommandItem>
     );
@@ -65,7 +62,9 @@ const MemoizedBuyerCommandItem = memo(
       <CommandItem
         key={buyerData.id}
         value={buyerData.full_name}
-        onSelect={() => onSelect(buyerData.id)}
+        onSelect={() => {
+          return onSelect(buyerData.id);
+        }}
       >
         {buyerData.full_name}
       </CommandItem>
@@ -76,13 +75,7 @@ const MemoizedBuyerCommandItem = memo(
   }
 );
 
-function ManageSalesDialog({
-  open,
-  onOpenChange,
-  mode = "add",
-  initialSalesData,
-  onDialogClose,
-}) {
+function ManageSalesDialog({ open, onOpenChange, mode = 'add', initialSalesData, onDialogClose }) {
   const {
     transactionDate,
     setTransactionDate,
@@ -166,7 +159,7 @@ function ManageSalesDialog({
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" className="w-full justify-start">
-                  {format(transactionDate, "PPP", { locale: id })}
+                  {format(transactionDate, 'PPP', { locale: id })}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
@@ -174,9 +167,7 @@ function ManageSalesDialog({
                   mode="single"
                   selected={transactionDate}
                   onSelect={(date) => {
-                    setTransactionDate(
-                      date ? format(date, "yyyy-MM-dd") : undefined
-                    );
+                    setTransactionDate(date ? format(date, 'yyyy-MM-dd') : undefined);
                   }}
                   locale={id}
                   initialFocus
@@ -184,9 +175,7 @@ function ManageSalesDialog({
               </PopoverContent>
             </Popover>
             {formErrors.transactionDate && (
-              <p className="text-sm text-red-500 mt-1">
-                {formErrors.transactionDate}
-              </p>
+              <p className="text-sm text-red-500 mt-1">{formErrors.transactionDate}</p>
             )}
           </div>
 
@@ -195,12 +184,12 @@ function ManageSalesDialog({
             <Input
               placeholder="Domain URL"
               value={domainURL}
-              onChange={(e) => setDomainURL(e.target.value)}
+              onChange={(e) => {
+                return setDomainURL(e.target.value);
+              }}
             />
             {formErrors.domainURL && (
-              <p className="text-sm text-red-500 mt-1">
-                {formErrors.domainURL}
-              </p>
+              <p className="text-sm text-red-500 mt-1">{formErrors.domainURL}</p>
             )}
           </div>
 
@@ -210,10 +199,10 @@ function ManageSalesDialog({
               variant="outline"
               className="w-full overflow-hidden text-ellipsis whitespace-nowrap flex-start"
               type="button"
-              disabled={
-                isVillagesLoading || villagesError || isInitialNamesLoading
-              }
-              onClick={() => setIsVillageCommandDialogOpen(true)}
+              disabled={isVillagesLoading || villagesError || isInitialNamesLoading}
+              onClick={() => {
+                return setIsVillageCommandDialogOpen(true);
+              }}
             >
               {getVillageButtonLabel()}
             </Button>
@@ -260,13 +249,11 @@ function ManageSalesDialog({
             </CommandDialog>
             {villagesError && (
               <p className="text-sm text-red-500 mt-1">
-                {villagesError.message || "Gagal memuat desa."}
+                {villagesError.message || 'Gagal memuat desa.'}
               </p>
             )}
             {formErrors.villageId && (
-              <p className="text-sm text-red-500 mt-1">
-                {formErrors.villageId}
-              </p>
+              <p className="text-sm text-red-500 mt-1">{formErrors.villageId}</p>
             )}
           </div>
 
@@ -278,17 +265,14 @@ function ManageSalesDialog({
               disabled={isProductsLoading || productsError}
             >
               <SelectTrigger className="w-full">
-                <SelectValue
-                  placeholder={
-                    productsError ? "Gagal memuat Produk" : "Pilih Produk"
-                  }
-                >
+                <SelectValue placeholder={productsError ? 'Gagal memuat Produk' : 'Pilih Produk'}>
                   {productId
-                    ? productsData?.find((p) => p.id == productId)?.name ||
-                      "Produk Dipilih"
+                    ? productsData?.find((p) => {
+                        return p.id == productId;
+                      })?.name || 'Produk Dipilih'
                     : productsError
-                      ? "Gagal memuat Produk"
-                      : "Pilih Produk"}
+                      ? 'Gagal memuat Produk'
+                      : 'Pilih Produk'}
                 </SelectValue>
               </SelectTrigger>
               <SelectContent className="max-h-64 overflow-auto">
@@ -302,31 +286,29 @@ function ManageSalesDialog({
                     Gagal memuat produk. Silakan coba lagi.
                   </div>
                 ) : productsData?.length ? (
-                  productsData.map((product) => (
-                    <SelectItem
-                      key={product.id}
-                      value={product.id}
-                      selected={product.id == productId}
-                    >
-                      {product.name}
-                    </SelectItem>
-                  ))
+                  productsData.map((product) => {
+                    return (
+                      <SelectItem
+                        key={product.id}
+                        value={product.id}
+                        selected={product.id == productId}
+                      >
+                        {product.name}
+                      </SelectItem>
+                    );
+                  })
                 ) : (
-                  <div className="p-2 text-center text-gray-500">
-                    Produk tidak ditemukan.
-                  </div>
+                  <div className="p-2 text-center text-gray-500">Produk tidak ditemukan.</div>
                 )}
               </SelectContent>
             </Select>
             {productsError && (
               <p className="text-sm text-red-500 mt-1">
-                {productsError.message || "Gagal memuat produk."}
+                {productsError.message || 'Gagal memuat produk.'}
               </p>
             )}
             {formErrors.productId && (
-              <p className="text-sm text-red-500 mt-1">
-                {formErrors.productId}
-              </p>
+              <p className="text-sm text-red-500 mt-1">{formErrors.productId}</p>
             )}
           </div>
 
@@ -337,7 +319,9 @@ function ManageSalesDialog({
               className="w-full overflow-hidden text-ellipsis whitespace-nowrap items-start"
               type="button"
               disabled={isBuyersLoading || buyersError || isInitialNamesLoading}
-              onClick={() => setIsBuyerCommandDialogOpen(true)}
+              onClick={() => {
+                return setIsBuyerCommandDialogOpen(true);
+              }}
             >
               {getBuyerButtonLabel()}
             </Button>
@@ -367,8 +351,7 @@ function ManageSalesDialog({
                   ) : (
                     <CommandGroup>
                       {buyersData?.map((buyerData, index) => {
-                        buyerItemRefs.current[index] =
-                          buyerItemRefs.current[index] || createRef();
+                        buyerItemRefs.current[index] = buyerItemRefs.current[index] || createRef();
                         return (
                           <MemoizedBuyerCommandItem
                             key={buyerData.id}
@@ -384,7 +367,7 @@ function ManageSalesDialog({
             </CommandDialog>
             {buyersError && (
               <p className="text-sm text-red-500 mt-1">
-                {buyersError.message || "Gagal memuat pembeli."}
+                {buyersError.message || 'Gagal memuat pembeli.'}
               </p>
             )}
             {formErrors.buyerId && (
@@ -394,17 +377,11 @@ function ManageSalesDialog({
 
           <DialogFooter>
             <DialogClose asChild>
-              <Button
-                variant="secondary"
-                onClick={handleDialogCloseButtonClick}
-              >
+              <Button variant="secondary" onClick={handleDialogCloseButtonClick}>
                 Batal
               </Button>
             </DialogClose>
-            <Button
-              type="submit"
-              disabled={isInitialNamesLoading || isSubmitting}
-            >
+            <Button type="submit" disabled={isInitialNamesLoading || isSubmitting}>
               Simpan
             </Button>
           </DialogFooter>

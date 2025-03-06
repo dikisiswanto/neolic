@@ -1,27 +1,27 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 export function useSalesDataMutation() {
   const queryClient = useQueryClient();
 
   const mutateSalesData = async (mode, salesData, id = null) => {
-    let url = "/api/data/sales";
-    let method = "POST";
+    let url = '/api/data/sales';
+    let method = 'POST';
 
-    if (mode === "edit") {
+    if (mode === 'edit') {
       url = `/api/data/sales/${id}`;
-      method = "PUT";
-    } else if (mode === "delete") {
+      method = 'PUT';
+    } else if (mode === 'delete') {
       url = `/api/data/sales/${id}`;
-      method = "DELETE";
+      method = 'DELETE';
     }
 
     const res = await fetch(url, {
       method,
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
-      body: mode === "delete" ? null : JSON.stringify(salesData),
+      body: mode === 'delete' ? null : JSON.stringify(salesData),
     });
 
     console.log(res);
@@ -29,7 +29,7 @@ export function useSalesDataMutation() {
     if (!res.ok) {
       const errorData = await res.json();
       throw {
-        message: `Gagal ${mode === "edit" ? "mengupdate" : mode === "delete" ? "menghapus" : "menambah"} data penjualan.`,
+        message: `Gagal ${mode === 'edit' ? 'mengupdate' : mode === 'delete' ? 'menghapus' : 'menambah'} data penjualan.`,
         errors: errorData.errors,
       };
     }
@@ -39,15 +39,16 @@ export function useSalesDataMutation() {
   };
 
   const mutation = useMutation({
-    mutationFn: ({ mode, salesData, id }) =>
-      mutateSalesData(mode, salesData, id),
+    mutationFn: ({ mode, salesData, id }) => {
+      return mutateSalesData(mode, salesData, id);
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries(["sales"]);
-      queryClient.invalidateQueries(["stats"]);
-      toast.success("Data penjualan berhasil diperbarui!");
+      queryClient.invalidateQueries(['sales']);
+      queryClient.invalidateQueries(['stats']);
+      toast.success('Data penjualan berhasil diperbarui!');
     },
     onError: (error) => {
-      toast.error(error.message || "Terjadi kesalahan.");
+      toast.error(error.message || 'Terjadi kesalahan.');
     },
   });
 
