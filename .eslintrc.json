@@ -26,5 +26,10 @@
         "printWidth": 100
       }
     ]
+  },
+  "settings": {
+    "next": {
+      "rootDir": "src"
+    }
   }
 }

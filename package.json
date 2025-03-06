@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "lint:fix": "next lint --fix",
+    "lint:fix": "next lint --fix --dir",
     "format": "prettier --write .",
     "prepare": "husky"
   },
@@ -60,11 +60,5 @@
   },
   "overrides": {
     "react-is": "^19.0.0-rc-69d4b800-20241021"
-  },
-  "lint-staged": {
-    "**/*.{js,jsx,ts,tsx}": [
-      "yarn lint:fix",
-      "git add"
-    ]
   }
 }
