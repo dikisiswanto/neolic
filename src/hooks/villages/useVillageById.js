@@ -29,7 +29,7 @@ export const useVillageById = (id) => {
     enabled: !!id,
     staleTime: 60 * 1000,
     onError: () => {
-                                                                      toast.error('Gagal memuat desa.', {
+      toast.error('Gagal memuat desa.', {
         duration: 5000,
       });
     },

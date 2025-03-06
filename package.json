@@ -54,10 +54,17 @@
     "eslint-plugin-next": "^0.0.0",
     "eslint-plugin-prettier": "^5.2.3",
     "husky": "^9.1.7",
+    "lint-staged": "^15.4.3",
     "prettier": "^3.5.2",
     "tailwindcss": "^4"
   },
   "overrides": {
     "react-is": "^19.0.0-rc-69d4b800-20241021"
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx}": [
+      "yarn lint:fix",
+      "git add"
+    ]
   }
 }
