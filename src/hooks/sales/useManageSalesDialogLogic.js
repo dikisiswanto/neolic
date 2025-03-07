@@ -54,14 +54,16 @@ const useManageSalesDialogLogic = ({
     open
       ? {
           page: 1,
-          pageSize: 20,
+          pageSize: 25,
           search: debouncedVillageSearchTerm,
         }
       : { isFetch: false }
   );
+
   const villagesData = useMemo(() => {
     return villagesQueryData?.data || [];
   }, [villagesQueryData?.data]);
+
   const handleVillageSelect = useCallback(
     (id) => {
       setVillageId(id);
@@ -82,7 +84,7 @@ const useManageSalesDialogLogic = ({
     open
       ? {
           page: 1,
-          pageSize: 20,
+          pageSize: 25,
           search: debouncedBuyerSearchTerm,
         }
       : { isFetch: false }
@@ -176,6 +178,11 @@ const useManageSalesDialogLogic = ({
       setVillageId(initialSalesData.village_id);
     } else if (mode === 'add' && open) {
       resetForm();
+    }
+
+    if (!open) {
+      setVillageSearchTerm('');
+      setBuyerSearchTerm('');
     }
   }, [
     mode,

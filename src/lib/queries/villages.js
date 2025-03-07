@@ -28,7 +28,7 @@ export async function getVillages({ search = '', page = 1, pageSize = 10 }) {
     if (isDigitSearch) {
       query = query.or([`name.ilike.%${search}%`, `id.eq.${search}`]);
     } else {
-      query = query.or([`name.ilike.%${search}%`]);
+      query = query.or([`name.ilike.${search}%`]);
     }
   }
   const { data, error, count } = await query;

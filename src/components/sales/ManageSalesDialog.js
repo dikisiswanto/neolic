@@ -210,7 +210,7 @@ function ManageSalesDialog({ open, onOpenChange, mode = 'add', initialSalesData,
               open={isVillageCommandDialogOpen}
               onOpenChange={setIsVillageCommandDialogOpen}
             >
-              <Command>
+              <Command shouldFilter={false}>
                 <CommandInput
                   placeholder="Cari desa..."
                   value={villageSearchTerm}
@@ -219,7 +219,6 @@ function ManageSalesDialog({ open, onOpenChange, mode = 'add', initialSalesData,
                   disabled={isVillagesLoading || villagesError}
                 />
                 <CommandList className="mobile:py-1">
-                  <CommandEmpty>Desa tidak ditemukan.</CommandEmpty>
                   {isVillagesLoading ? (
                     <div className="flex items-center justify-center p-2">
                       <LoaderCircle className="h-5 w-5 animate-spin" />
@@ -229,9 +228,11 @@ function ManageSalesDialog({ open, onOpenChange, mode = 'add', initialSalesData,
                     <CommandGroup>
                       <CommandItem disabled>Gagal memuat desa.</CommandItem>
                     </CommandGroup>
+                  ) : villagesData.length === 0 ? (
+                    <CommandEmpty>Desa tidak ditemukan.</CommandEmpty>
                   ) : (
                     <CommandGroup>
-                      {villagesData?.map((village, index) => {
+                      {villagesData.map((village, index) => {
                         villageItemRefs.current[index] =
                           villageItemRefs.current[index] || createRef();
                         return (
@@ -329,7 +330,7 @@ function ManageSalesDialog({ open, onOpenChange, mode = 'add', initialSalesData,
               open={isBuyerCommandDialogOpen}
               onOpenChange={setIsBuyerCommandDialogOpen}
             >
-              <Command>
+              <Command shouldFilter={false}>
                 <CommandInput
                   ref={buyerSearchInputRef}
                   placeholder="Cari nama pembeli..."
@@ -337,8 +338,7 @@ function ManageSalesDialog({ open, onOpenChange, mode = 'add', initialSalesData,
                   onValueChange={setBuyerSearchTerm}
                   disabled={isBuyersLoading || buyersError}
                 />
-                <CommandList className="max-h-64 overflow-y-scroll mobile:py-1">
-                  <CommandEmpty>Pembeli tidak ditemukan.</CommandEmpty>
+                <CommandList className="mobile:py-1">
                   {isBuyersLoading ? (
                     <div className="flex items-center justify-center p-2">
                       <LoaderCircle className="h-5 w-5 animate-spin" />
@@ -348,9 +348,11 @@ function ManageSalesDialog({ open, onOpenChange, mode = 'add', initialSalesData,
                     <CommandGroup>
                       <CommandItem disabled>Gagal memuat pembeli.</CommandItem>
                     </CommandGroup>
+                  ) : buyersData.length === 0 ? (
+                    <CommandEmpty>Pembeli tidak ditemukan.</CommandEmpty>
                   ) : (
                     <CommandGroup>
-                      {buyersData?.map((buyerData, index) => {
+                      {buyersData.map((buyerData, index) => {
                         buyerItemRefs.current[index] = buyerItemRefs.current[index] || createRef();
                         return (
                           <MemoizedBuyerCommandItem
