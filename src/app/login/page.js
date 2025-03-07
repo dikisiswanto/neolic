@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { LoaderCircle } from 'lucide-react';
 
 function LoginPageComponent() {
   const { login, loading } = useAuth();
@@ -69,7 +70,13 @@ function LoginPageComponent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<p>Memuat laman login...</p>}>
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-gray-200 px-3">
+          <LoaderCircle className="h-5 w-5 animate-spin" />
+        </div>
+      }
+    >
       <LoginPageComponent />
     </Suspense>
   );
