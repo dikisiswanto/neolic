@@ -4,8 +4,8 @@ import { getSaleByVillageId } from '@/lib/queries/sales';
 import jwt from 'jsonwebtoken';
 
 export async function POST(req) {
-  const { json } = req;
-  const { token, village_id, serial_number, theme_version } = await json();
+  const { body } = req;
+  const { token, village_id, serial_number, theme_version } = body;
 
   if (!token || !village_id || !serial_number) {
     return createErrorResponse('Missing token, village_id, or serial_number', 400, 200);
