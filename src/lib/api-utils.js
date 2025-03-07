@@ -13,3 +13,11 @@ export function createCorsResponse(response, status) {
 export function createErrorResponse(message, code, status) {
   return createCorsResponse({ status: 'error', code, message }, status);
 }
+
+export function authenticateRequest(headers) {
+  const bearerToken =
+    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9eyJpZCI6IjIwMjIwMTAxIiwibmFtZSI6IkpXVCBUb2tlbiB1bnR1ay இரவு Temas IiwiaWF0IjoxNTE2MjM5MDIyfQ.f5yfPN0RqqDQHrxZeDq3bIpxDtyGuyr8Nsso2-FZVDU';
+
+  const authorization = headers.get('authorization');
+  return bearerToken === authorization;
+}
