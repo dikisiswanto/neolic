@@ -26,7 +26,7 @@ export async function getVillages({ search = '', page = 1, pageSize = 10 }) {
     const isDigitSearch = /^\d+$/.test(search);
 
     if (isDigitSearch) {
-      query = query.or([`name.ilike.%${search}%`, `id.eq.${search}`]);
+      query = query.or([`id.eq.${search}`]);
     } else {
       query = query.or([`name.ilike.${search}%`]);
     }
