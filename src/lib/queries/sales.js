@@ -145,3 +145,46 @@ export async function deleteSale(id) {
     throw error;
   }
 }
+
+export async function getSaleByUrl(url) {
+  try {
+    const { data, error } = await supabase
+      .from('purchases')
+      .select('domain_url, product_id, products(name, serial_number)')
+      .eq('domain_url', url)
+      .single();
+
+    if (error) {
+      console.error('Supabase get error in getSaleByUrl:', error);
+      throw new Error(`Failed to get sale data from Supabase: ${error.message}`);
+    }
+
+    return { data };
+  } catch (error) {
+    console.error('Error in getSaleByUrl:', error);
+    throw error;
+  }
+}
+
+export async function getSaleByVillageId(villageId) {
+  try {
+    const { data, error } = await supabase
+      .from('purchases')
+      .select(
+        'domain_url, villages(id,name,district:districts(name, regency:regencies(name, province:provinces(name)))), product_id, products(name, serial_number)'
+      )
+      .eq('village_id', villageId)
+      .limit(1)
+      .single();
+
+    if (error) {
+      console.error('Supabase get error in getSaleByVillageId:', error);
+      throw new Error(`Failed to get sale data from Supabase: ${error.message}`);
+    }
+
+    return { data };
+  } catch (error) {
+    console.error('Error in getSaleByVillageId:', error);
+    throw error;
+  }
+}

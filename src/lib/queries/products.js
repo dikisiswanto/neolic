@@ -49,3 +49,22 @@ export async function getProductById(id) {
     throw error;
   }
 }
+
+export async function getProductBySerialNumber(serialNumber) {
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('id, current_version')
+      .eq('serial_number', serialNumber)
+      .single();
+
+    if (error) {
+      console.error('Supabase error saat getProductBySerialNumber', error);
+      throw error;
+    }
+    return data;
+  } catch (error) {
+    console.error('Error in getProductBySerialNumber query:', error);
+    throw error;
+  }
+}
