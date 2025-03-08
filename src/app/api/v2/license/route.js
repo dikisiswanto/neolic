@@ -4,9 +4,7 @@ import { getSaleByVillageId } from '@/lib/queries/sales';
 import jwt from 'jsonwebtoken';
 
 export async function POST(req) {
-  const { body } = req;
-  console.log(body);
-  console.log(req);
+  const body = await req.json();
   const { village_id, serial_number } = body;
 
   if (!village_id || !serial_number) {
