@@ -7,18 +7,10 @@ const CORS_HEADERS = {
 };
 
 export function createCorsResponse(response, status) {
-  console.log(response, status);
   return NextResponse.json(response, { status, headers: CORS_HEADERS });
 }
 
 export function createErrorResponse(message, code, status) {
-  console.error({
-    status: 'error',
-    code,
-    message,
-    registered: false,
-    redir_uri: 'https://silirdev.com/403.html',
-  });
   return createCorsResponse(
     {
       status: 'error',

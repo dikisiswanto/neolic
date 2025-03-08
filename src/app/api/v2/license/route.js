@@ -5,6 +5,8 @@ import jwt from 'jsonwebtoken';
 
 export async function POST(req) {
   const { body } = req;
+  console.log(body);
+  console.log(req);
   const { village_id, serial_number } = body;
 
   if (!village_id || !serial_number) {
