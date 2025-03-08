@@ -159,7 +159,7 @@ export async function getSaleByUrl(url) {
       throw new Error(`Failed to get sale data from Supabase: ${error.message}`);
     }
 
-    return { data };
+    return { data, error };
   } catch (error) {
     console.error('Error in getSaleByUrl:', error);
     throw error;
@@ -182,7 +182,7 @@ export async function getSaleByVillageId(villageId) {
       throw new Error(`Failed to get sale data from Supabase: ${error.message}`);
     }
 
-    return { data };
+    return { data, error };
   } catch (error) {
     console.error('Error in getSaleByVillageId:', error);
     throw error;

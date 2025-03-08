@@ -43,7 +43,7 @@ export async function getProductById(id) {
       console.error('Supabase error saat getProductById', error);
       throw error;
     }
-    return data;
+    return { data, error };
   } catch (error) {
     console.error('Error in getProductById query:', error);
     throw error;
@@ -54,7 +54,7 @@ export async function getProductBySerialNumber(serialNumber) {
   try {
     const { data, error } = await supabase
       .from('products')
-      .select('id, current_version')
+      .select('*')
       .eq('serial_number', serialNumber)
       .single();
 
@@ -62,7 +62,7 @@ export async function getProductBySerialNumber(serialNumber) {
       console.error('Supabase error saat getProductBySerialNumber', error);
       throw error;
     }
-    return data;
+    return { data, error };
   } catch (error) {
     console.error('Error in getProductBySerialNumber query:', error);
     throw error;

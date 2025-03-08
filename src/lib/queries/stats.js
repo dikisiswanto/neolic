@@ -55,7 +55,7 @@ const getMonthlySalesData = async () => {
 
     return data;
   } catch (error) {
-    console.error('Terjadi kesalahan dalam fungsi getMonthlySalesData (direct MV query):', error);
+    console.error('Terjadi kesalahan dalam fungsi getMonthlySalesData:', error);
     throw error;
   }
 };
