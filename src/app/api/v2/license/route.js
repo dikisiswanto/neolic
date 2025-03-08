@@ -1,7 +1,15 @@
-import { createCorsResponse, createErrorResponse } from '@/lib/api-utils';
+import { CORS_HEADERS, createCorsResponse, createErrorResponse } from '@/lib/api-utils';
 import { getProductBySerialNumber } from '@/lib/queries/products';
 import { getSaleByVillageId } from '@/lib/queries/sales';
 import jwt from 'jsonwebtoken';
+import { NextResponse } from 'next/server';
+
+export function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: CORS_HEADERS,
+  });
+}
 
 export async function POST(req) {
   try {
