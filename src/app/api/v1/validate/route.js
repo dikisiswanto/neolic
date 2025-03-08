@@ -1,6 +1,19 @@
-import { createCorsResponse, createErrorResponse, authenticateRequest } from '@/lib/api-utils';
+import {
+  createCorsResponse,
+  createErrorResponse,
+  authenticateRequest,
+  CORS_HEADERS,
+} from '@/lib/api-utils';
 import { getProductBySerialNumber } from '@/lib/queries/products';
 import { getSaleByUrl } from '@/lib/queries/sales';
+import { NextResponse } from 'next/server';
+
+export function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: CORS_HEADERS,
+  });
+}
 
 export async function POST(req) {
   try {
@@ -36,7 +49,8 @@ export async function POST(req) {
       },
       200
     );
-  } catch {
+  } catch (error) {
+    console.error(error);
     return createErrorResponse('Invalid request format', 400, 200);
   }
 }

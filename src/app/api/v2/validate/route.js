@@ -15,7 +15,10 @@ export async function POST(req) {
       return createErrorResponse('Missing token, village_id, or serial_number', 400, 200);
 
     const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
-    if (decoded.village_id !== village_id || decoded.products.serial_number !== serial_number) {
+    if (
+      decoded.villages.id !== parseInt(village_id, 10) ||
+      decoded.products.serial_number !== serial_number
+    ) {
       return createErrorResponse('Token verification failed', 403, 200);
     }
 

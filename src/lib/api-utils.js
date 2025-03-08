@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const CORS_HEADERS = {
+export const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
@@ -25,7 +25,7 @@ export function createErrorResponse(message, code, status) {
 
 export function authenticateRequest(headers) {
   const bearerToken =
-    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9eyJpZCI6IjIwMjIwMTAxIiwibmFtZSI6IkpXVCBUb2tlbiB1bnR1ay இரவு Temas IiwiaWF0IjoxNTE2MjM5MDIyfQ.f5yfPN0RqqDQHrxZeDq3bIpxDtyGuyr8Nsso2-FZVDU';
+    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIwMjIwMTAxIiwibmFtZSI6IkpXVCBUb2tlbiB1bnR1ayBUZW1hIiwiaWF0IjoxNTE2MjM5MDIyfQ.f5yfPN0RqqDQHrxZeDq3bIpxDtyGuyr8Nsso2-FZVDU';
 
   const authorization = headers.get('authorization');
   return bearerToken === authorization;
