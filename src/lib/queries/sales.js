@@ -150,7 +150,7 @@ export async function getSaleByUrl(url) {
   try {
     const { data, error } = await supabase
       .from('purchases')
-      .select('domain_url, product_id, products(name, serial_number)')
+      .select('domain_url, product_id, village_id, products(name, serial_number)')
       .eq('domain_url', url)
       .single();
 
@@ -171,7 +171,7 @@ export async function getSaleByVillageId(villageId) {
     const { data, error } = await supabase
       .from('purchases')
       .select(
-        'domain_url, villages(id,name,district:districts(name, regency:regencies(name, province:provinces(name)))), product_id, products(name, serial_number)'
+        'domain_url, village_id, villages(id,name,district:districts(name, regency:regencies(name, province:provinces(name)))), product_id, products(name, serial_number)'
       )
       .eq('village_id', villageId)
       .limit(1)
