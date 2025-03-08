@@ -4,14 +4,25 @@ import { getSaleByVillageId } from '@/lib/queries/sales';
 import jwt from 'jsonwebtoken';
 
 export async function POST(req) {
-  const body = await req.json();
-  const { token, village_id, serial_number, theme_version } = body;
-
-  if (!token || !village_id || !serial_number) {
-    return createErrorResponse('Missing token, village_id, or serial_number', 400, 200);
-  }
-
   try {
+    let body;
+    const contentType = req.headers.get('content-type') || '';
+
+    if (contentType.includes('application/json')) {
+      body = await req.json();
+    } else if (contentType.includes('application/x-www-form-urlencoded')) {
+      const formData = await req.text();
+      body = Object.fromEntries(new URLSearchParams(formData));
+    } else {
+      return createErrorResponse('Unsupported Content-Type', 400, 200);
+    }
+
+    const { token, village_id, serial_number, theme_version } = body;
+
+    if (!token || !village_id || !serial_number) {
+      return createErrorResponse('Missing token, village_id, or serial_number', 400, 200);
+    }
+
     const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
 
     if (decoded.village_id == village_id && decoded.products.serial_number == serial_number) {
@@ -40,6 +51,6 @@ export async function POST(req) {
 
     return createErrorResponse('Token provided failed to verify', 403, 200);
   } catch (err) {
-    return createErrorResponse(err.message || 'Token verification failed', 403, 200);
+    return createErrorResponse('Invalid request format', 400, 200);
   }
 }
