@@ -18,9 +18,12 @@ export async function POST(req) {
       ? await req.json()
       : Object.fromEntries(new URLSearchParams(await req.text()));
 
+    console.info('Request body:', body);
+
     const { token, village_id, serial_number, theme_version } = body;
-    if (!token || !village_id || !serial_number)
+    if (!token || !village_id || !serial_number) {
       return createErrorResponse('Missing token, village_id, or serial_number', 400, 200);
+    }
 
     const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
     if (
