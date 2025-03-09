@@ -27,8 +27,8 @@ export async function POST(req) {
 
     const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
     if (
-      decoded.villages.id !== parseInt(village_id, 10) ||
-      decoded.products.serial_number !== serial_number
+      decoded.villages?.id !== parseInt(village_id, 10) ||
+      decoded.products?.serial_number !== serial_number
     ) {
       return createErrorResponse('Token verification failed', 403, 200);
     }
