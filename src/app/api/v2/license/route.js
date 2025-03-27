@@ -18,6 +18,8 @@ export async function POST(req) {
       ? await req.json()
       : Object.fromEntries(new URLSearchParams(await req.text()));
 
+    console.info('Request body:', body);
+
     const { village_id, serial_number } = body;
     if (!village_id || !serial_number)
       return createErrorResponse('Missing village_id or serial_number', 400, 200);
