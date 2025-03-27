@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { toast } from 'sonner';
+import { format } from 'date-fns';
 
 function useExportCSV() {
   const convertToCSV = useCallback((data) => {
@@ -32,11 +33,8 @@ function useExportCSV() {
             break;
           case 'Tgl Transaksi':
             if (sale.purchased_at) {
-              value = new Intl.DateTimeFormat('en-CA', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-              }).format(new Date(sale.purchased_at));
+              const date = new Date(sale.purchased_at);
+              value = format(date, 'yyyy-MM-dd');
             } else {
               value = '';
             }
