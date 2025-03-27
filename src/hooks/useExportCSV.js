@@ -31,7 +31,15 @@ function useExportCSV() {
             value = index + 1;
             break;
           case 'Tgl Transaksi':
-            value = new Date(sale.purchased_at).toLocaleDateString();
+            if (sale.purchased_at) {
+              value = new Intl.DateTimeFormat('en-CA', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+              }).format(new Date(sale.purchased_at));
+            } else {
+              value = '';
+            }
             break;
           case 'Domain':
             value = sale.domain_url || '';
