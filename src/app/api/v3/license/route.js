@@ -1,6 +1,7 @@
 import { CORS_HEADERS, createCorsResponse, createErrorResponse } from '@/lib/api-utils';
 import { getProductBySerialNumber } from '@/lib/queries/products';
 import { getSaleByVillageId } from '@/lib/queries/sales';
+import { generateProof } from '@/lib/security';
 import { NextResponse } from 'next/server';
 
 export function OPTIONS() {
@@ -30,10 +31,17 @@ export async function POST(req) {
 
     const exists = !!purchase && !!product && purchase.product_id === product.id;
 
+    if (!exists) {
+      return createCorsResponse({ status: 'success', exists: false }, 200);
+    }
+
+    const proof = generateProof({ village_id, serial_number });
+
     return createCorsResponse(
       {
         status: 'success',
-        exists, // true / false
+        exists: true,
+        proof,
       },
       200
     );
